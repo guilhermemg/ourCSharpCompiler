@@ -1,46 +1,52 @@
 grammar org.xtext.ourcs.OurCS with org.eclipse.xtext.common.Terminals
 
 generate ourCS "http://www.xtext.org/ourcs/OurCS"
-
 import "http://www.eclipse.org/emf/2002/Ecore" as ecore
 
 Model:
-	greetings+=Greeting*;
-	
-Greeting:
-	'Hello' name=ID '!';
+//greetings+=Greeting*;
+	proRule1+=ProRule1*;
 
-	
-	/**
-terminal PROFILE:
-   ((CHAR|DIGIT)(CHAR|DIGIT)'.'(CHAR|DIGIT)(CHAR|DIGIT))
-;
+/* SYNTAX RULES (PRODUCTION RULES) ------------------------------------------ */
+
+//Greeting hidden(WS, ML_COMMENT, SL_COMMENT):
+//	'Hello' name=ID '!' PROFILE;
+
+ProRule1:
+	'::: ' ID '=' INTEGER_LITERAL ';';
+
+	//terminal COMPOSE_ID :
+//	'comp_id' ID.ID.ID.ID
+//;
+
+/* REGRAS DE CONTROLE ------------------------------------------------------- */
+//terminal PROFILE:
+//	((CHAR | DIGIT) (CHAR | DIGIT) '.' (CHAR | DIGIT) (CHAR | DIGIT));
+
 terminal DIGIT:
-    ('0'..'9')*
-;
-*/
+	('0'..'9')*;
 
-/* LEXICAL GRAMMAR A.1 ---------------------------------------------------*/
+/* REGRA BASE ---------------------------------------------------------------- */
+terminal CHAR returns ecore::EString:
+	('a'..'z' | 'A'..'Z');
+
+/* LEXICAL GRAMMAR A.1 ------------------------------------------------------- */
 terminal INPUT:
 	INPUT_SECTION_PART;
 
 terminal INPUT_SECTION_PART:
-	INPUT_ELEMENT* NEW_LINE_CHARACTER;
-	// | PP_DIRECTIVE;
+	INPUT_ELEMENT*; //NEW_LINE_CHARACTER
+// | PP_DIRECTIVE;
 terminal INPUT_ELEMENT:
 	WHITESPACE | COMMENT | TOKEN;
 
-terminal CHAR returns ecore::EString:
-	('a'..'z' | 'A'..'Z');
-
 /* LINE TERMINATORS A.1.1 ------------------------------------------------*/
 terminal NEW_LINE_CHARACTER:
-	'\\\\n'
-	/*('U000D) | // Carriage return character
-    ('U' 000A) | // Line feed character 
-    ('U'0085) | // Next line character
-    ('U'+2028) | // Line separator character 
-    ('U'+2029); // Paragraph separator character */;
+	'U+000D' | // Carriage return character
+	'U+000A' | // Line feed character 
+	'U+0085' | // Next line character
+	'U+2028' | // Line separator character 
+	'U+2029'; // Paragraph separator character;
 
 /* WHITESPACE A.1.2 --------------------------------------------------------- */
 terminal WHITESPACE:
@@ -48,16 +54,16 @@ terminal WHITESPACE:
 
 /* COMMENTS A.1.3 -------------------------------------------------------- */
 terminal SINGLE_LINE_COMMENT:
-	"//" CHAR*;
+	SL_COMMENT;
 
 terminal COMMENT:
 	SINGLE_LINE_COMMENT | DELIMITED_COMMENT;
 
 terminal INPUT_CHARACTER:
-	CHAR;
+	CHAR !(NEW_LINE_CHARACTER);
 
 terminal DELIMITED_COMMENT:
-	"/*" DELIMITED_COMMENT_SECTION* "*"+ "/";
+	"/*" DELIMITED_COMMENT_SECTION* "*" "/";
 
 terminal DELIMITED_COMMENT_SECTION:
 	NOT_ASTERISK "*"+ NOT_SLASH;
@@ -68,7 +74,7 @@ terminal NOT_ASTERISK:
 terminal NOT_SLASH:
 	CHAR !('/');
 
-/* TOKEN ----------------------------------------------------------------- */
+/* TOKEN A.1.4 ----------------------------------------------------------------- */
 terminal TOKEN:
 	ID | KEYWORD | INTEGER_LITERAL |
 	REAL_LITERAL |
@@ -76,105 +82,128 @@ terminal TOKEN:
 	STRING_LITERAL |
 	OPERATOR_OR_PUNCTUATOR;
 
-terminal INTEGER_LITERAL:
-	INT;
-
-terminal REAL_LITERAL:
-	INT '.' INT;
-
-terminal CHARACTER_LITERAL:
-	CHAR;
-
-terminal STRING_LITERAL: CHAR*;
-	//'"' REGULAR_STRING_CHARACTER* '"' |
-	//'@"' VERBATIM_STRING_CHARACTER* '"';
+/* UNICODE CHARACTER ESCAPE SEQUENCE A.1.5 ------------------------------------- */
+terminal UNICODE_CHARACTER_ESCAPE_SEQUENCE:
+	("u" HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT) | ("U" HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
+	HEX_DIGIT HEX_DIGIT);
 
 /*IDENTIFIERS A.1.6 --------------------------------------------------------*/
 // ==> RULE ID FROM Terminals.xtext
 
 /* KEYWORD A.1.7 ----------------------------------------------------- */
 terminal KEYWORD:
-	"abstract" |
-	"as" |
-	"base" |
-	"bool" |
-	"break" |
-	"byte" |
-	"case" |
-	"catch" |
-	"char" |
-	"checked" |
-	"class" |
-	"const" |
-	"continue" |
-	"decimal" |
-	"default" |
-	"delegate" |
-	"do" |
-	"double" |
-	"else" |
-	"enum" |
-	"event" |
-	"explicit" |
-	"extern" |
-	"false" |
-	"finally" |
-	"fixed" |
-	"float" |
-	"for" |
-	"foreach" |
-	"goto" |
-	"if" |
-	"implicit" |
-	"in" |
-	"int" |
-	"interface" |
-	"internal" |
-	"is" |
-	"lock" |
-	"long" |
-	"namespace" |
-	"new" |
-	"null" |
-	"object" |
-	"operator" |
-	"out" |
-	"override" |
-	"params" |
-	"private" |
-	"protected" |
-	"public" |
-	"readonly" |
-	"ref" |
-	"return" |
-	"sbyte" |
-	"sealed" |
-	"short" |
-	"sizeof" |
-	"stackalloc" |
-	"static" |
-	"string" |
-	"struct" |
-	"switch" |
-	"this" |
-	"throw" |
-	"true" |
-	"try" |
-	"typeof" |
-	"uint" |
-	"ulong" |
-	"unchecked" |
-	"unsafe" |
-	"ushort" |
-	"using" |
-	"virtual" |
-	"void" |
-	"volatile" |
-	"while";
+	"default" | "explicit" | "extern" | "fixed" | "foreach" | "implicit" | "in" | "internal" | "is" | "override" | "sbyte"
+	| "sealed" | "sizeof" | "stackalloc" | "string" | "struct" | "uint" | "ulong" | "unchecked" | "unsafe" | "ushort" |
+	"using" | "virtual";
 
 /* LITERALS A.1.8 ---------------------------------------------------- */
+terminal LITERAL:
+	BOOL_LITERAL |
+	INTEGER_LITERAL |
+	REAL_LITERAL |
+	CHARACTER_LITERAL |
+	STRING_LITERAL |
+	NULL_LITERAL;
 
-/* OPERATOR AND PUNCTUATOR A.1.9 -------------------------------------- */
+terminal BOOL_LITERAL:
+	"true"
+	"false";
+
+terminal INTEGER_LITERAL:
+	(DECIMAL_DIG+ INTEGER_TYPE_SUFFIX?) |
+    ("0x" HEX_DIGIT+ INTEGER_TYPE_SUFFIX?) |
+    ("0X" HEX_DIGIT INTEGER_TYPE_SUFFIX?);
+
+terminal DECIMAL_DIG:
+	"0" |
+	"1" |
+	"2" |
+	"3" |
+	"4" |
+	"5" |
+	"6" |
+	"7" |
+	"8" |
+	"9";
+
+terminal INTEGER_TYPE_SUFFIX:
+	"U" |
+	"u" |
+	"L" |
+	"l" |
+	"UL" |
+	"Ul" |
+	"uL" |
+	"ul" |
+	"LU" |
+	"Lu" |
+	"lU" |
+	"lu";
+
+terminal HEX_DIGIT:
+	"0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "A" | "B" | "C" | "D" | "E" | "F" | "a" | "b" | "c" | "d"
+	| "e" | "f";
+
+terminal REAL_LITERAL:
+	(DECIMAL_DIG* "." DECIMAL_DIG+ EXPONENT_PART? REAL_TYPE_SUFFIX?) |
+	(DECIMAL_DIG EXPONENT_PART REAL_TYPE_SUFFIX?) |
+	(DECIMAL_DIG+ REAL_TYPE_SUFFIX);
+
+terminal EXPONENT_PART:
+	"e" SIGN? DECIMAL_DIG+
+	"E" SIGN? DECIMAL_DIG+;
+
+terminal SIGN:
+	"+"
+	"-";
+
+terminal REAL_TYPE_SUFFIX:
+	"F" |
+	"f" |
+	"D" |
+	"d" |
+	"M" |
+	"m";
+
+terminal CHARACTER_LITERAL:
+	"'" CHAR "'";
+
+terminal CHARACTER:
+	SINGLE_CHARACTER |
+	"\\" ESCAPE_SEQUENCE;
+
+terminal ESCAPE_SEQUENCE:
+	"'" | '"' | "\\" | "0" | "a" | "b" | "f" | "n" | "r" | "t" | "v" | HEXADECIMAL_ESCAPE_SEQUENCE |
+	UNICODE_CHARACTER_ESCAPE_SEQUENCE;
+
+terminal SINGLE_CHARACTER:
+	CHAR !('U+0027' | 'U+005C' | NEW_LINE_CHARACTER);
+
+terminal HEXADECIMAL_ESCAPE_SEQUENCE:
+	"x" HEX_DIGIT (HEX_DIGIT (HEX_DIGIT HEX_DIGIT?)?)?;
+
+terminal STRING_LITERAL:
+	'"' REGULAR_STRING_CHARACTER* '"' | '@"' VERBATIM_STRING_CHARACTER* '"';
+
+terminal REGULAR_STRING_CHARACTER:
+	SINGLE_REGULAR_STRING_LITERAL_CHARACTER | "\\" ESCAPE_SEQUENCE;
+
+terminal VERBATIM_STRING_CHARACTER:
+	SINGLE_VERBATIM_STRING_LITERAL_CHARACTER | QUOTE_ESCAPE_SEQUENCE;
+
+terminal SINGLE_REGULAR_STRING_LITERAL_CHARACTER:
+	CHAR !(('U+0022')); // | ('U005C') | (NEW_LINE_CHARACTER));
+
+terminal SINGLE_VERBATIM_STRING_LITERAL_CHARACTER:
+	CHAR !('U+0022');
+
+terminal QUOTE_ESCAPE_SEQUENCE:
+	'""';
+
+terminal NULL_LITERAL:
+	"null";
+
+/* OPERATOR AND PUNCTUATOR A.1.9 ------------------------------------------------- */
 terminal OPERATOR_OR_PUNCTUATOR:
 	"{" | "}" | "[" | "]" | "(" | ")" | "." | "," | ":" | ";" | "+" | "-" | "*" | "/" | "%" | "&" | "|" | "^" | "!" | "~"
 	| "=" | "<" | ">" | "?" | "++" | "--" | "&&" | "||" | "<<" | ">>" | "==" | "!=" | "<=" | ">=" | "+=" | "-=" | "*=" |
