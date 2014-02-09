@@ -21,14 +21,14 @@ ProRule1:
 
 /* REGRAS DE CONTROLE ------------------------------------------------------- */
 //terminal PROFILE:
-//	((CHAR | DIGIT) (CHAR | DIGIT) '.' (CHAR | DIGIT) (CHAR | DIGIT));
+//	((ASCII_CHAR | DIGIT) (ASCII_CHAR | DIGIT) '.' (ASCII_CHAR | DIGIT) (ASCII_CHAR | DIGIT));
 
-terminal DIGIT:
-	('0'..'9')*;
+//terminal DIGIT:
+//	('0'..'9')*;
 
 /* REGRA BASE ---------------------------------------------------------------- */
-terminal CHAR returns ecore::EString:
-	('a'..'z' | 'A'..'Z');
+terminal ASCII_CHAR: // RETURN A 2-DIGIT ASCII CHARACTER
+	'0x' ('0'..'7') ('0'..'9'|'A'..'F');
 
 /* LEXICAL GRAMMAR A.1 ------------------------------------------------------- */
 terminal INPUT:
@@ -37,16 +37,17 @@ terminal INPUT:
 terminal INPUT_SECTION_PART:
 	INPUT_ELEMENT*; //NEW_LINE_CHARACTER
 // | PP_DIRECTIVE;
+
 terminal INPUT_ELEMENT:
 	WHITESPACE | COMMENT | TOKEN;
 
 /* LINE TERMINATORS A.1.1 ------------------------------------------------*/
 terminal NEW_LINE_CHARACTER:
-	'U+000D' | // Carriage return character
-	'U+000A' | // Line feed character 
-	'U+0085' | // Next line character
-	'U+2028' | // Line separator character 
-	'U+2029'; // Paragraph separator character;
+	'000D' | // Carriage return character
+	'000A' | // Line feed character 
+	'0085' | // Next line character
+	'2028' | // Line separator character 
+	'2029'; // Paragraph separator character;
 
 /* WHITESPACE A.1.2 --------------------------------------------------------- */
 terminal WHITESPACE:
@@ -60,7 +61,7 @@ terminal COMMENT:
 	SINGLE_LINE_COMMENT | DELIMITED_COMMENT;
 
 terminal INPUT_CHARACTER:
-	CHAR !(NEW_LINE_CHARACTER);
+	ASCII_CHAR | !(NEW_LINE_CHARACTER);
 
 terminal DELIMITED_COMMENT:
 	"/*" DELIMITED_COMMENT_SECTION* "*" "/";
@@ -69,10 +70,10 @@ terminal DELIMITED_COMMENT_SECTION:
 	NOT_ASTERISK "*"+ NOT_SLASH;
 
 terminal NOT_ASTERISK:
-	CHAR !('*');
+	ASCII_CHAR | !('*');
 
 terminal NOT_SLASH:
-	CHAR !('/');
+	ASCII_CHAR | !('/');
 
 /* TOKEN A.1.4 ----------------------------------------------------------------- */
 terminal TOKEN:
@@ -166,7 +167,7 @@ terminal REAL_TYPE_SUFFIX:
 	"m";
 
 terminal CHARACTER_LITERAL:
-	"'" CHAR "'";
+	"'" ASCII_CHAR "'";
 
 terminal CHARACTER:
 	SINGLE_CHARACTER |
@@ -177,7 +178,7 @@ terminal ESCAPE_SEQUENCE:
 	UNICODE_CHARACTER_ESCAPE_SEQUENCE;
 
 terminal SINGLE_CHARACTER:
-	CHAR !('U+0027' | 'U+005C' | NEW_LINE_CHARACTER);
+	ASCII_CHAR | !('0027' | '005C' | NEW_LINE_CHARACTER);
 
 terminal HEXADECIMAL_ESCAPE_SEQUENCE:
 	"x" HEX_DIGIT (HEX_DIGIT (HEX_DIGIT HEX_DIGIT?)?)?;
@@ -192,10 +193,10 @@ terminal VERBATIM_STRING_CHARACTER:
 	SINGLE_VERBATIM_STRING_LITERAL_CHARACTER | QUOTE_ESCAPE_SEQUENCE;
 
 terminal SINGLE_REGULAR_STRING_LITERAL_CHARACTER:
-	CHAR !(('U+0022')); // | ('U005C') | (NEW_LINE_CHARACTER));
+	ASCII_CHAR | !(('0022') | ('005C') | (NEW_LINE_CHARACTER));
 
 terminal SINGLE_VERBATIM_STRING_LITERAL_CHARACTER:
-	CHAR !('U+0022');
+	ASCII_CHAR | !('0022');
 
 terminal QUOTE_ESCAPE_SEQUENCE:
 	'""';
