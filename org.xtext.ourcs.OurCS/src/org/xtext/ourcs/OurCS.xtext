@@ -1,7 +1,8 @@
-grammar org.xtext.ourcs.OurCS with org.eclipse.xtext.common.Terminals
+grammar org.xtext.example.mydsl.MyDsl with org.eclipse.xtext.common.Terminals
 
-generate ourCS "http://www.xtext.org/ourcs/OurCS"
+generate myDsl "http://www.xtext.org/example/mydsl/MyDsl"
 import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+
 
 Model:
 //greetings+=Greeting*;
@@ -13,7 +14,7 @@ Model:
 //	'Hello' name=ID '!' PROFILE;
 
 ProRule1:
-	'::: ' ID '=' INTEGER_LITERAL ';';
+	INPUT;
 
 	//terminal COMPOSE_ID :
 //	'comp_id' ID.ID.ID.ID
@@ -31,179 +32,179 @@ terminal ASCII_CHAR: // RETURN A 2-DIGIT ASCII CHARACTER
 	'0x' ('0'..'7') ('0'..'9'|'A'..'F');
 
 /* LEXICAL GRAMMAR A.1 ------------------------------------------------------- */
-terminal INPUT:
+INPUT:
 	INPUT_SECTION_PART;
 
-terminal INPUT_SECTION_PART:
-	INPUT_ELEMENT*; //NEW_LINE_CHARACTER
+INPUT_SECTION_PART:
+	ID*  NEW_LINE_CHARACTER;
 // | PP_DIRECTIVE;
 
-terminal INPUT_ELEMENT:
-	WHITESPACE | COMMENT | TOKEN;
+//ID:
+//	ID;
 
 /* LINE TERMINATORS A.1.1 ------------------------------------------------*/
-terminal NEW_LINE_CHARACTER:
+NEW_LINE_CHARACTER:
 	'000D' | // Carriage return character
 	'000A' | // Line feed character 
 	'0085' | // Next line character
 	'2028' | // Line separator character 
 	'2029'; // Paragraph separator character;
 
-/* WHITESPACE A.1.2 --------------------------------------------------------- */
-terminal WHITESPACE:
-	WS;
+/* WS A.1.2 --------------------------------------------------------- */
+//terminal WS:
+//	WS;
 
 /* COMMENTS A.1.3 -------------------------------------------------------- */
-terminal SINGLE_LINE_COMMENT:
-	SL_COMMENT;
+//SINGLE_LINE_COMMENT:
+//	SL_COMMENT;
+//
+//COMMENT:
+//	SINGLE_LINE_COMMENT | DELIMITED_COMMENT;
+//
+////terminal INPUT_CHARACTER:
+////	ASCII_CHAR | !(NEW_LINE_CHARACTER);
+////
+//DELIMITED_COMMENT:
+//	"/*" DELIMITED_COMMENT_SECTION* "*" "/";
+//
+//DELIMITED_COMMENT_SECTION:
+//	NOT_ASTERISK "*"+ NOT_SLASH;
+//
+//terminal NOT_ASTERISK:
+//	(ASCII_CHAR | !('*'));
+//
+//terminal NOT_SLASH:
+//	(ASCII_CHAR | !('002F'));
 
-terminal COMMENT:
-	SINGLE_LINE_COMMENT | DELIMITED_COMMENT;
-
-terminal INPUT_CHARACTER:
-	ASCII_CHAR | !(NEW_LINE_CHARACTER);
-
-terminal DELIMITED_COMMENT:
-	"/*" DELIMITED_COMMENT_SECTION* "*" "/";
-
-terminal DELIMITED_COMMENT_SECTION:
-	NOT_ASTERISK "*"+ NOT_SLASH;
-
-terminal NOT_ASTERISK:
-	ASCII_CHAR | !('*');
-
-terminal NOT_SLASH:
-	ASCII_CHAR | !('/');
-
-/* TOKEN A.1.4 ----------------------------------------------------------------- */
-terminal TOKEN:
-	ID | KEYWORD | INTEGER_LITERAL |
-	REAL_LITERAL |
-	CHARACTER_LITERAL |
-	STRING_LITERAL |
+///* TOKEN A.1.4 ----------------------------------------------------------------- */
+TOKEN:
+	ID | KEYWORD | //| INTEGER_LITERAL |
+//	REAL_LITERAL |
+//	CHARACTER_LITERAL |
+//	STRING_LITERAL |
 	OPERATOR_OR_PUNCTUATOR;
 
-/* UNICODE CHARACTER ESCAPE SEQUENCE A.1.5 ------------------------------------- */
-terminal UNICODE_CHARACTER_ESCAPE_SEQUENCE:
-	("u" HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT) | ("U" HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
-	HEX_DIGIT HEX_DIGIT);
-
-/*IDENTIFIERS A.1.6 --------------------------------------------------------*/
-// ==> RULE ID FROM Terminals.xtext
-
-/* KEYWORD A.1.7 ----------------------------------------------------- */
+///* UNICODE CHARACTER ESCAPE SEQUENCE A.1.5 ------------------------------------- */
+//terminal UNICODE_CHARACTER_ESCAPE_SEQUENCE:
+//	("u" HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT) | ("U" HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
+//	HEX_DIGIT HEX_DIGIT);
+//
+///*IDENTIFIERS A.1.6 --------------------------------------------------------*/
+//// ==> RULE ID FROM Terminals.xtext
+//
+///* KEYWORD A.1.7 ----------------------------------------------------- */
 terminal KEYWORD:
-	"default" | "explicit" | "extern" | "fixed" | "foreach" | "implicit" | "in" | "internal" | "is" | "override" | "sbyte"
-	| "sealed" | "sizeof" | "stackalloc" | "string" | "struct" | "uint" | "ulong" | "unchecked" | "unsafe" | "ushort" |
-	"using" | "virtual";
+	'default' | 'explicit' | 'extern' | 'fixed' | 'foreach' | 'implicit' | 'in' | 'internal' | 'is' | 'override' | 'sbyte'
+	| 'sealed' | 'sizeof' | 'stackalloc' | 'string' | 'struct' | 'uint' | 'ulong' | 'unchecked' | 'unsafe' | 'ushort' |
+	'using' | 'virtual';
 
-/* LITERALS A.1.8 ---------------------------------------------------- */
-terminal LITERAL:
-	BOOL_LITERAL |
-	INTEGER_LITERAL |
-	REAL_LITERAL |
-	CHARACTER_LITERAL |
-	STRING_LITERAL |
-	NULL_LITERAL;
+///* LITERALS A.1.8 ---------------------------------------------------- */
+LITERAL:
+	BOOL_LITERAL ;
+//	INTEGER_LITERAL |
+//	REAL_LITERAL |
+//	CHARACTER_LITERAL |
+//	STRING_LITERAL |
+//	NULL_LITERAL;
 
 terminal BOOL_LITERAL:
-	"true"
-	"false";
-
-terminal INTEGER_LITERAL:
-	(DECIMAL_DIG+ INTEGER_TYPE_SUFFIX?) |
-    ("0x" HEX_DIGIT+ INTEGER_TYPE_SUFFIX?) |
-    ("0X" HEX_DIGIT INTEGER_TYPE_SUFFIX?);
-
-terminal DECIMAL_DIG:
-	"0" |
-	"1" |
-	"2" |
-	"3" |
-	"4" |
-	"5" |
-	"6" |
-	"7" |
-	"8" |
-	"9";
-
-terminal INTEGER_TYPE_SUFFIX:
-	"U" |
-	"u" |
-	"L" |
-	"l" |
-	"UL" |
-	"Ul" |
-	"uL" |
-	"ul" |
-	"LU" |
-	"Lu" |
-	"lU" |
-	"lu";
-
-terminal HEX_DIGIT:
-	"0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "A" | "B" | "C" | "D" | "E" | "F" | "a" | "b" | "c" | "d"
-	| "e" | "f";
-
-terminal REAL_LITERAL:
-	(DECIMAL_DIG* "." DECIMAL_DIG+ EXPONENT_PART? REAL_TYPE_SUFFIX?) |
-	(DECIMAL_DIG EXPONENT_PART REAL_TYPE_SUFFIX?) |
-	(DECIMAL_DIG+ REAL_TYPE_SUFFIX);
-
-terminal EXPONENT_PART:
-	"e" SIGN? DECIMAL_DIG+
-	"E" SIGN? DECIMAL_DIG+;
-
-terminal SIGN:
-	"+"
-	"-";
-
-terminal REAL_TYPE_SUFFIX:
-	"F" |
-	"f" |
-	"D" |
-	"d" |
-	"M" |
-	"m";
-
-terminal CHARACTER_LITERAL:
-	"'" ASCII_CHAR "'";
-
-terminal CHARACTER:
-	SINGLE_CHARACTER |
-	"\\" ESCAPE_SEQUENCE;
-
-terminal ESCAPE_SEQUENCE:
-	"'" | '"' | "\\" | "0" | "a" | "b" | "f" | "n" | "r" | "t" | "v" | HEXADECIMAL_ESCAPE_SEQUENCE |
-	UNICODE_CHARACTER_ESCAPE_SEQUENCE;
-
-terminal SINGLE_CHARACTER:
-	ASCII_CHAR | !('0027' | '005C' | NEW_LINE_CHARACTER);
-
-terminal HEXADECIMAL_ESCAPE_SEQUENCE:
-	"x" HEX_DIGIT (HEX_DIGIT (HEX_DIGIT HEX_DIGIT?)?)?;
-
-terminal STRING_LITERAL:
-	'"' REGULAR_STRING_CHARACTER* '"' | '@"' VERBATIM_STRING_CHARACTER* '"';
-
-terminal REGULAR_STRING_CHARACTER:
-	SINGLE_REGULAR_STRING_LITERAL_CHARACTER | "\\" ESCAPE_SEQUENCE;
-
-terminal VERBATIM_STRING_CHARACTER:
-	SINGLE_VERBATIM_STRING_LITERAL_CHARACTER | QUOTE_ESCAPE_SEQUENCE;
-
-terminal SINGLE_REGULAR_STRING_LITERAL_CHARACTER:
-	ASCII_CHAR | !(('0022') | ('005C') | (NEW_LINE_CHARACTER));
-
-terminal SINGLE_VERBATIM_STRING_LITERAL_CHARACTER:
-	ASCII_CHAR | !('0022');
-
-terminal QUOTE_ESCAPE_SEQUENCE:
-	'""';
-
-terminal NULL_LITERAL:
-	"null";
-
+	'true' |
+	'false';
+//
+//terminal INTEGER_LITERAL:
+//	(DECIMAL_DIG+ INTEGER_TYPE_SUFFIX?) |
+//    ("0x" HEX_DIGIT+ INTEGER_TYPE_SUFFIX?) |
+//    ("0X" HEX_DIGIT INTEGER_TYPE_SUFFIX?);
+//
+//terminal DECIMAL_DIG:
+//	"0" |
+//	"1" |
+//	"2" |
+//	"3" |
+//	"4" |
+//	"5" |
+//	"6" |
+//	"7" |
+//	"8" |
+//	"9";
+//
+//terminal INTEGER_TYPE_SUFFIX:
+//	"U" |
+//	"u" |
+//	"L" |
+//	"l" |
+//	"UL" |
+//	"Ul" |
+//	"uL" |
+//	"ul" |
+//	"LU" |
+//	"Lu" |
+//	"lU" |
+//	"lu";
+//
+//terminal HEX_DIGIT:
+//	"0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "A" | "B" | "C" | "D" | "E" | "F" | "a" | "b" | "c" | "d"
+//	| "e" | "f";
+//
+//terminal REAL_LITERAL:
+//	(DECIMAL_DIG* "." DECIMAL_DIG+ EXPONENT_PART? REAL_TYPE_SUFFIX?) |
+//	(DECIMAL_DIG EXPONENT_PART REAL_TYPE_SUFFIX?) |
+//	(DECIMAL_DIG+ REAL_TYPE_SUFFIX);
+//
+//terminal EXPONENT_PART:
+//	"e" SIGN? DECIMAL_DIG+
+//	"E" SIGN? DECIMAL_DIG+;
+//
+//terminal SIGN:
+//	"+"
+//	"-";
+//
+//terminal REAL_TYPE_SUFFIX:
+//	"F" |
+//	"f" |
+//	"D" |
+//	"d" |
+//	"M" |
+//	"m";
+//
+//terminal CHARACTER_LITERAL:
+//	"'" ASCII_CHAR "'";
+//
+//terminal CHARACTER:
+//	SINGLE_CHARACTER |
+//	"\\" ESCAPE_SEQUENCE;
+//
+//terminal ESCAPE_SEQUENCE:
+//	"'" | '"' | "\\" | "0" | "a" | "b" | "f" | "n" | "r" | "t" | "v" | HEXADECIMAL_ESCAPE_SEQUENCE |
+//	UNICODE_CHARACTER_ESCAPE_SEQUENCE;
+//
+//terminal SINGLE_CHARACTER:
+//	ASCII_CHAR | !('0027' | '005C' | NEW_LINE_CHARACTER);
+//
+//terminal HEXADECIMAL_ESCAPE_SEQUENCE:
+//	"x" HEX_DIGIT (HEX_DIGIT (HEX_DIGIT HEX_DIGIT?)?)?;
+//
+//terminal STRING_LITERAL:
+//	'"' REGULAR_STRING_CHARACTER* '"' | '@"' VERBATIM_STRING_CHARACTER* '"';
+//
+//terminal REGULAR_STRING_CHARACTER:
+//	SINGLE_REGULAR_STRING_LITERAL_CHARACTER | "\\" ESCAPE_SEQUENCE;
+//
+//terminal VERBATIM_STRING_CHARACTER:
+//	SINGLE_VERBATIM_STRING_LITERAL_CHARACTER | QUOTE_ESCAPE_SEQUENCE;
+//
+//terminal SINGLE_REGULAR_STRING_LITERAL_CHARACTER:
+//	ASCII_CHAR | !(('0022') | ('005C') | (NEW_LINE_CHARACTER));
+//
+//terminal SINGLE_VERBATIM_STRING_LITERAL_CHARACTER:
+//	ASCII_CHAR | !('0022');
+//
+//terminal QUOTE_ESCAPE_SEQUENCE:
+//	'""';
+//
+//terminal NULL_LITERAL:
+//	"null";
+//
 /* OPERATOR AND PUNCTUATOR A.1.9 ------------------------------------------------- */
 terminal OPERATOR_OR_PUNCTUATOR:
 	"{" | "}" | "[" | "]" | "(" | ")" | "." | "," | ":" | ";" | "+" | "-" | "*" | "/" | "%" | "&" | "|" | "^" | "!" | "~"
@@ -211,4 +212,113 @@ terminal OPERATOR_OR_PUNCTUATOR:
 	"/=" | "%=" | "&=" | "|=" | "^=" | "<<=" | ">>=" | "->";
 
 /* PRE-PROCESSING DIRECTIVES A.1.10 ----------------------------------------------- */
-	
+
+PP_DIRECTIVE:
+    PP_DECLARATION ;
+//    pp-conditional |
+//    pp-line |
+//    pp-diagnostic |
+//    pp-region;
+
+PP_NEW_LINE:
+    WS? SL_COMMENT? NEW_LINE_CHARACTER;
+
+terminal CONDITIONAL_SYMBOL:
+    ((KEYWORD | ID) | !(BOOL_LITERAL));
+
+//pp-expression:
+//    WS? pp-or-expression WS?
+//
+//pp-or-expression:
+//    pp-and-expression
+//    pp-or-expression WS? "||" WS? pp-and-expression
+//
+//pp-and-expression:
+//    pp-equality-expression
+//    pp-and-expression WS? "&&" WS? pp-equality-expression
+//
+//pp-equality-expression:
+//    pp-unary-expression
+//    pp-equality-expression WS? "==" WS? pp-unary-expression
+//    pp-equality-expression WS? "!=" WS? pp-unary-expression
+//
+//pp-unary-expression:
+//    pp-primary-expression
+//    "!" WS? pp-unary-expression
+//
+//pp-primary-expression:
+//    "true"
+//    "false"
+//     CONDITIONAL_SYMBOL
+//    "(" WS? pp-expression WS? ")"
+//
+PP_DECLARATION:
+    (WS? '#' WS? 'define' WS CONDITIONAL_SYMBOL PP_NEW_LINE) |
+    (WS? '#' WS? 'undef' WS CONDITIONAL_SYMBOL PP_NEW_LINE);
+    
+//pp-conditional:
+//    pp-if-section pp-elif-sections? pp-else-section? pp-endif
+//
+//pp-if-section:
+//    WS? "#" WS? "if" WS pp-expression PP_NEW_LINE conditional-section?
+//
+//pp-elif-sections:
+//    pp-elif-section
+//    pp-elif-sections pp-elif-section
+//
+//pp-elif-section:
+//    WS? "#" WS? "elif" WS pp-expression PP_NEW_LINE conditional-section?
+//
+//pp-else-section:
+//    WS? "#" WS? "else" PP_NEW_LINE conditional-section?
+//
+//pp-endif:
+//    WS? "#" WS? "endif" PP_NEW_LINE
+//
+//conditional-section:
+//    input-section-part+
+//    skipped-section-part+
+//
+//skipped-section-part:
+//    skipped-characters? new-line
+//    PP_DIRECTIVE
+//
+//skipped-characters:
+//    WS? not-number-sign input-character*
+//
+//not-number-sign:
+//    Any input-character except #
+//
+//pp-line:
+//    WS? "#" WS? "line" WS? line-indicator PP_NEW_LINE
+//
+//line-indicator:
+//    decimal-digit+ WS file-name
+//    decimal-digit+
+//    "default"
+//
+//file-name:
+//    '"' file-name-characters '"'
+//
+//file-name-characters:
+//    file-name-character
+//    file-name-characters file-name-character
+//
+//file-name-character:
+//    Any character except " (U+0022), and new-line
+//
+//pp-diagnostic:
+//    WS? "#" WS? "error" WS? pp-message
+//    WS? "#" WS? "warning" WS? pp-message
+//
+//pp-message:
+//    input-character* new-line
+//
+//pp-region:
+//    pp-start-region conditional-section? pp-end-region
+//
+//pp-start-region:
+//    WS? "#" WS? "region" WS? pp-message
+//
+//pp-end-region:
+//    WS? "#" WS? "endregion" WS? pp-message
