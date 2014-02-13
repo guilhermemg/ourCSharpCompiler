@@ -14,7 +14,7 @@ Model:
 //	'Hello' name=ID '!' PROFILE;
 
 ProRule1:
-	INPUT;
+	(INPUT);
 
 	//terminal COMPOSE_ID :
 //	'comp_id' ID.ID.ID.ID
@@ -36,19 +36,21 @@ INPUT:
 	INPUT_SECTION_PART;
 
 INPUT_SECTION_PART:
-	ID*  NEW_LINE_CHARACTER;
+	ID* NEW_LINE_CHARACTER;
 // | PP_DIRECTIVE;
 
 //ID:
 //	ID;
 
 /* LINE TERMINATORS A.1.1 ------------------------------------------------*/
-NEW_LINE_CHARACTER:
-	'000D' | // Carriage return character
-	'000A' | // Line feed character 
-	'0085' | // Next line character
-	'2028' | // Line separator character 
-	'2029'; // Paragraph separator character;
+terminal NEW_LINE_CHARACTER:
+	WS
+;
+//	'000D' | // Carriage return character
+//	'000A' | // Line feed character 
+//	'0085' | // Next line character
+//	'2028' | // Line separator character 
+//	'2029'; // Paragraph separator character;
 
 /* WS A.1.2 --------------------------------------------------------- */
 //terminal WS:
@@ -207,9 +209,9 @@ terminal BOOL_LITERAL:
 //
 /* OPERATOR AND PUNCTUATOR A.1.9 ------------------------------------------------- */
 terminal OPERATOR_OR_PUNCTUATOR:
-	"{" | "}" | "[" | "]" | "(" | ")" | "." | "," | ":" | ";" | "+" | "-" | "*" | "/" | "%" | "&" | "|" | "^" | "!" | "~"
-	| "=" | "<" | ">" | "?" | "++" | "--" | "&&" | "||" | "<<" | ">>" | "==" | "!=" | "<=" | ">=" | "+=" | "-=" | "*=" |
-	"/=" | "%=" | "&=" | "|=" | "^=" | "<<=" | ">>=" | "->";
+	'{' | '}' | '[' | ']' | '(' | ')' | '.' | ',' | ':' | ';' | '+' | '-' | '*' | '/' | '%' | '&' | '|' | '^' | '!' | '~'
+	| '=' | '<' | '>' | '?' | '++' | '--' | '&&' | '||' | '<<' | '>>' | '==' | '!=' | '<=' | '>=' | '+=' | '-=' | '*=' |
+	'/=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=' | '->';
 
 /* PRE-PROCESSING DIRECTIVES A.1.10 ----------------------------------------------- */
 
@@ -223,8 +225,8 @@ PP_DIRECTIVE:
 PP_NEW_LINE:
     WS? SL_COMMENT? NEW_LINE_CHARACTER;
 
-terminal CONDITIONAL_SYMBOL:
-    ((KEYWORD | ID) | !(BOOL_LITERAL));
+CONDITIONAL_SYMBOL:
+    (KEYWORD | ID);
 
 //pp-expression:
 //    WS? pp-or-expression WS?
