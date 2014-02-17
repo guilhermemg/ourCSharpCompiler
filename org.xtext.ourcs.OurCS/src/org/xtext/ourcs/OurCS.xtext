@@ -36,47 +36,15 @@ INPUT:
 	INPUT_SECTION_PART;
 
 INPUT_SECTION_PART:
-	ID* NEW_LINE_CHARACTER;
-// | PP_DIRECTIVE;
+	ID* NEW_LINE_CHARACTER | PP_DIRECTIVE;
 
-//ID:
-//	ID;
+/* WS2 - WHITESPACE */
+terminal WS2:
+	' ';
 
 /* LINE TERMINATORS A.1.1 ------------------------------------------------*/
 terminal NEW_LINE_CHARACTER:
-	WS
-;
-//	'000D' | // Carriage return character
-//	'000A' | // Line feed character 
-//	'0085' | // Next line character
-//	'2028' | // Line separator character 
-//	'2029'; // Paragraph separator character;
-
-/* WS A.1.2 --------------------------------------------------------- */
-//terminal WS:
-//	WS;
-
-/* COMMENTS A.1.3 -------------------------------------------------------- */
-//SINGLE_LINE_COMMENT:
-//	SL_COMMENT;
-//
-//COMMENT:
-//	SINGLE_LINE_COMMENT | DELIMITED_COMMENT;
-//
-////terminal INPUT_CHARACTER:
-////	ASCII_CHAR | !(NEW_LINE_CHARACTER);
-////
-//DELIMITED_COMMENT:
-//	"/*" DELIMITED_COMMENT_SECTION* "*" "/";
-//
-//DELIMITED_COMMENT_SECTION:
-//	NOT_ASTERISK "*"+ NOT_SLASH;
-//
-//terminal NOT_ASTERISK:
-//	(ASCII_CHAR | !('*'));
-//
-//terminal NOT_SLASH:
-//	(ASCII_CHAR | !('002F'));
+	'\n' | 'r' | '\t';
 
 ///* TOKEN A.1.4 ----------------------------------------------------------------- */
 TOKEN:
@@ -90,10 +58,7 @@ TOKEN:
 //terminal UNICODE_CHARACTER_ESCAPE_SEQUENCE:
 //	("u" HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT) | ("U" HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
 //	HEX_DIGIT HEX_DIGIT);
-//
-///*IDENTIFIERS A.1.6 --------------------------------------------------------*/
-//// ==> RULE ID FROM Terminals.xtext
-//
+
 ///* KEYWORD A.1.7 ----------------------------------------------------- */
 terminal KEYWORD:
 	'default' | 'explicit' | 'extern' | 'fixed' | 'foreach' | 'implicit' | 'in' | 'internal' | 'is' | 'override' | 'sbyte'
@@ -216,81 +181,88 @@ terminal OPERATOR_OR_PUNCTUATOR:
 /* PRE-PROCESSING DIRECTIVES A.1.10 ----------------------------------------------- */
 
 PP_DIRECTIVE:
-    PP_DECLARATION ;
-//    pp-conditional |
-//    pp-line |
+    PP_DECLARATION |
+    PP_CONDITIONAL;
+//     | pp-line |
 //    pp-diagnostic |
 //    pp-region;
 
 PP_NEW_LINE:
-    WS? SL_COMMENT? NEW_LINE_CHARACTER;
+    WS2? SL_COMMENT? NEW_LINE_CHARACTER;
 
 CONDITIONAL_SYMBOL:
-    (KEYWORD | ID);
+    KEYWORD | ID;
 
-//pp-expression:
-//    WS? pp-or-expression WS?
-//
-//pp-or-expression:
-//    pp-and-expression
-//    pp-or-expression WS? "||" WS? pp-and-expression
-//
-//pp-and-expression:
-//    pp-equality-expression
-//    pp-and-expression WS? "&&" WS? pp-equality-expression
-//
-//pp-equality-expression:
-//    pp-unary-expression
-//    pp-equality-expression WS? "==" WS? pp-unary-expression
-//    pp-equality-expression WS? "!=" WS? pp-unary-expression
-//
-//pp-unary-expression:
-//    pp-primary-expression
-//    "!" WS? pp-unary-expression
-//
-//pp-primary-expression:
-//    "true"
-//    "false"
-//     CONDITIONAL_SYMBOL
-//    "(" WS? pp-expression WS? ")"
-//
+PP_EXPRESSION:
+    WS2? PP_OR_EXPRESSION WS2?;
+
+PP_OR_EXPRESSION:
+    PP_AND_EXPRESSION |
+    PP_OR_EXPRESSION WS2? "||" WS2? PP_AND_EXPRESSION;
+
+PP_AND_EXPRESSION:
+    PP_EQUALITY_EXPRESSION |
+    PP_AND_EXPRESSION WS2? "&&" WS2? PP_EQUALITY_EXPRESSION;
+
+PP_EQUALITY_EXPRESSION:
+    PP_UNARY_EXPRESSION |
+    PP_EQUALITY_EXPRESSION WS2? "==" WS2? PP_UNARY_EXPRESSION |
+    PP_EQUALITY_EXPRESSION WS2? "!=" WS2? PP_UNARY_EXPRESSION;
+
+PP_UNARY_EXPRESSION:
+    PP_PRIMARY_EXPRESSION |
+    "!" WS? PP_UNARY_EXPRESSION;
+
+PP_PRIMARY_EXPRESSION:
+    "true" |
+    "false" |
+     CONDITIONAL_SYMBOL |
+    "(" WS2? PP_EXPRESSION WS2? ")";
+
 PP_DECLARATION:
-    (WS? '#' WS? 'define' WS CONDITIONAL_SYMBOL PP_NEW_LINE) |
-    (WS? '#' WS? 'undef' WS CONDITIONAL_SYMBOL PP_NEW_LINE);
+    (WS2? '#' WS2? 'define' WS2 CONDITIONAL_SYMBOL PP_NEW_LINE) |
+    (WS2? '#' WS2? 'undef' WS2 CONDITIONAL_SYMBOL PP_NEW_LINE);
+
+PP_ELIF_SECTION:
+    WS2? "#" WS2? "elif" WS2 PP_EXPRESSION PP_NEW_LINE CONDITIONAL_SECTION?;
     
-//pp-conditional:
-//    pp-if-section pp-elif-sections? pp-else-section? pp-endif
-//
-//pp-if-section:
-//    WS? "#" WS? "if" WS pp-expression PP_NEW_LINE conditional-section?
-//
-//pp-elif-sections:
-//    pp-elif-section
-//    pp-elif-sections pp-elif-section
-//
-//pp-elif-section:
-//    WS? "#" WS? "elif" WS pp-expression PP_NEW_LINE conditional-section?
-//
-//pp-else-section:
-//    WS? "#" WS? "else" PP_NEW_LINE conditional-section?
-//
-//pp-endif:
-//    WS? "#" WS? "endif" PP_NEW_LINE
-//
-//conditional-section:
-//    input-section-part+
-//    skipped-section-part+
-//
-//skipped-section-part:
-//    skipped-characters? new-line
-//    PP_DIRECTIVE
-//
-//skipped-characters:
-//    WS? not-number-sign input-character*
-//
-//not-number-sign:
-//    Any input-character except #
-//
+// ====> REGRA COM RECURSAO A ESQUERDA    
+//PP_ELIF_SECTIONS: 
+//    PP_ELIF_SECTION |
+//    PP_ELIF_SECTIONS PP_ELIF_SECTION;
+
+PP_ELIF_SECTIONS:
+	PP_ELIF_SECTION PP_ELIF_SECTIONS_LINE;
+
+PP_ELIF_SECTIONS_LINE:
+   (PP_ELIF_SECTION PP_ELIF_SECTIONS_LINE)?;
+   
+PP_CONDITIONAL:
+    PP_IF_SECTION PP_ELIF_SECTIONS? PP_ELSE_SECTION? PP_ENDIF;
+
+PP_IF_SECTION:
+    WS2? "#" WS2? "if" WS2 PP_EXPRESSION PP_NEW_LINE CONDITIONAL_SECTION?;
+
+PP_ELSE_SECTION:
+    WS2? "#" WS2? "else" PP_NEW_LINE CONDITIONAL_SECTION?;
+
+PP_ENDIF:
+    WS2? "#" WS2? "endif" PP_NEW_LINE;
+
+CONDITIONAL_SECTION:
+    INPUT_SECTION_PART+ |
+    SKIPPED_SECTION_PART+;
+
+SKIPPED_SECTION_PART:
+    SKIPPED_CHARACTERS? NEW_LINE_CHARACTER |
+    PP_DIRECTIVE;
+
+SKIPPED_CHARACTERS:
+    WS2? NOT_NUMBER_SIGN INPUT_CHARACTER*;
+
+NOT_NUMBER_SIGN:
+    Any INPUT_CHARACTER except #;
+
 //pp-line:
 //    WS? "#" WS? "line" WS? line-indicator PP_NEW_LINE
 //
@@ -307,17 +279,17 @@ PP_DECLARATION:
 //    file-name-characters file-name-character
 //
 //file-name-character:
-//    Any character except " (U+0022), and new-line
+//    Any character except " (U+0022), and NEW_LINE
 //
 //pp-diagnostic:
 //    WS? "#" WS? "error" WS? pp-message
 //    WS? "#" WS? "warning" WS? pp-message
 //
 //pp-message:
-//    input-character* new-line
+//    INPUT_CHARACTER* NEW_LINE
 //
 //pp-region:
-//    pp-start-region conditional-section? pp-end-region
+//    pp-start-region CONDITIONAL_SECTION? pp-end-region
 //
 //pp-start-region:
 //    WS? "#" WS? "region" WS? pp-message
