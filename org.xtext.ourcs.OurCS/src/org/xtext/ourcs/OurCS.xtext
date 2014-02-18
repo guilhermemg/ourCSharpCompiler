@@ -1,7 +1,7 @@
 grammar org.xtext.example.mydsl.MyDsl with org.eclipse.xtext.common.Terminals
 
-generate myDsl "http://www.xtext.org/example/mydsl/MyDsl"
-import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+generate myDsl 'http://www.xtext.org/example/mydsl/MyDsl'
+import 'http://www.eclipse.org/emf/2002/Ecore' as ecore
 
 
 Model:
@@ -10,7 +10,7 @@ Model:
 
 /* SYNTAX RULES (PRODUCTION RULES) ------------------------------------------ */
 
-//Greeting hidden(WS, ML_COMMENT, SL_COMMENT):
+//Greeting hidden(WS2, ML_COMMENT, SL_COMMENT):
 //	'Hello' name=ID '!' PROFILE;
 
 ProRule1:
@@ -36,11 +36,16 @@ INPUT:
 	INPUT_SECTION_PART;
 
 INPUT_SECTION_PART:
-	ID* NEW_LINE_CHARACTER | PP_DIRECTIVE;
+	INPUT_ELEMENT* NEW_LINE_CHARACTER | PP_DIRECTIVE;
+
+INPUT_ELEMENT:
+    WS2 |
+    //COMMENT |
+    TOKEN;
 
 /* WS2 - WHITESPACE */
 terminal WS2:
-	' ';
+	' '+;
 
 /* LINE TERMINATORS A.1.1 ------------------------------------------------*/
 terminal NEW_LINE_CHARACTER:
@@ -56,7 +61,7 @@ TOKEN:
 
 ///* UNICODE CHARACTER ESCAPE SEQUENCE A.1.5 ------------------------------------- */
 //terminal UNICODE_CHARACTER_ESCAPE_SEQUENCE:
-//	("u" HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT) | ("U" HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
+//	('u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT) | ('U' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
 //	HEX_DIGIT HEX_DIGIT);
 
 ///* KEYWORD A.1.7 ----------------------------------------------------- */
@@ -67,12 +72,12 @@ terminal KEYWORD:
 
 ///* LITERALS A.1.8 ---------------------------------------------------- */
 LITERAL:
-	BOOL_LITERAL ;
+	BOOL_LITERAL |
 //	INTEGER_LITERAL |
 //	REAL_LITERAL |
 //	CHARACTER_LITERAL |
 //	STRING_LITERAL |
-//	NULL_LITERAL;
+	NULL_LITERAL;
 
 terminal BOOL_LITERAL:
 	'true' |
@@ -80,82 +85,82 @@ terminal BOOL_LITERAL:
 //
 //terminal INTEGER_LITERAL:
 //	(DECIMAL_DIG+ INTEGER_TYPE_SUFFIX?) |
-//    ("0x" HEX_DIGIT+ INTEGER_TYPE_SUFFIX?) |
-//    ("0X" HEX_DIGIT INTEGER_TYPE_SUFFIX?);
+//    ('0x' HEX_DIGIT+ INTEGER_TYPE_SUFFIX?) |
+//    ('0X' HEX_DIGIT INTEGER_TYPE_SUFFIX?);
 //
 //terminal DECIMAL_DIG:
-//	"0" |
-//	"1" |
-//	"2" |
-//	"3" |
-//	"4" |
-//	"5" |
-//	"6" |
-//	"7" |
-//	"8" |
-//	"9";
+//	'0' |
+//	'1' |
+//	'2' |
+//	'3' |
+//	'4' |
+//	'5' |
+//	'6' |
+//	'7' |
+//	'8' |
+//	'9';
 //
 //terminal INTEGER_TYPE_SUFFIX:
-//	"U" |
-//	"u" |
-//	"L" |
-//	"l" |
-//	"UL" |
-//	"Ul" |
-//	"uL" |
-//	"ul" |
-//	"LU" |
-//	"Lu" |
-//	"lU" |
-//	"lu";
+//	'U' |
+//	'u' |
+//	'L' |
+//	'l' |
+//	'UL' |
+//	'Ul' |
+//	'uL' |
+//	'ul' |
+//	'LU' |
+//	'Lu' |
+//	'lU' |
+//	'lu';
 //
 //terminal HEX_DIGIT:
-//	"0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "A" | "B" | "C" | "D" | "E" | "F" | "a" | "b" | "c" | "d"
-//	| "e" | "f";
+//	'0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'a' | 'b' | 'c' | 'd'
+//	| 'e' | 'f';
 //
 //terminal REAL_LITERAL:
-//	(DECIMAL_DIG* "." DECIMAL_DIG+ EXPONENT_PART? REAL_TYPE_SUFFIX?) |
+//	(DECIMAL_DIG* '.' DECIMAL_DIG+ EXPONENT_PART? REAL_TYPE_SUFFIX?) |
 //	(DECIMAL_DIG EXPONENT_PART REAL_TYPE_SUFFIX?) |
 //	(DECIMAL_DIG+ REAL_TYPE_SUFFIX);
 //
 //terminal EXPONENT_PART:
-//	"e" SIGN? DECIMAL_DIG+
-//	"E" SIGN? DECIMAL_DIG+;
+//	'e' SIGN? DECIMAL_DIG+
+//	'E' SIGN? DECIMAL_DIG+;
 //
 //terminal SIGN:
-//	"+"
-//	"-";
+//	'+'
+//	'-';
 //
 //terminal REAL_TYPE_SUFFIX:
-//	"F" |
-//	"f" |
-//	"D" |
-//	"d" |
-//	"M" |
-//	"m";
+//	'F' |
+//	'f' |
+//	'D' |
+//	'd' |
+//	'M' |
+//	'm';
 //
 //terminal CHARACTER_LITERAL:
-//	"'" ASCII_CHAR "'";
+//	''' ASCII_CHAR ''';
 //
 //terminal CHARACTER:
 //	SINGLE_CHARACTER |
-//	"\\" ESCAPE_SEQUENCE;
+//	'\\' ESCAPE_SEQUENCE;
 //
 //terminal ESCAPE_SEQUENCE:
-//	"'" | '"' | "\\" | "0" | "a" | "b" | "f" | "n" | "r" | "t" | "v" | HEXADECIMAL_ESCAPE_SEQUENCE |
+//	''' | ''' | '\\' | '0' | 'a' | 'b' | 'f' | 'n' | 'r' | 't' | 'v' | HEXADECIMAL_ESCAPE_SEQUENCE |
 //	UNICODE_CHARACTER_ESCAPE_SEQUENCE;
 //
 //terminal SINGLE_CHARACTER:
 //	ASCII_CHAR | !('0027' | '005C' | NEW_LINE_CHARACTER);
 //
 //terminal HEXADECIMAL_ESCAPE_SEQUENCE:
-//	"x" HEX_DIGIT (HEX_DIGIT (HEX_DIGIT HEX_DIGIT?)?)?;
+//	'x' HEX_DIGIT (HEX_DIGIT (HEX_DIGIT HEX_DIGIT?)?)?;
 //
 //terminal STRING_LITERAL:
-//	'"' REGULAR_STRING_CHARACTER* '"' | '@"' VERBATIM_STRING_CHARACTER* '"';
+//	''' REGULAR_STRING_CHARACTER* ''' | '@'' VERBATIM_STRING_CHARACTER* ''';
 //
 //terminal REGULAR_STRING_CHARACTER:
-//	SINGLE_REGULAR_STRING_LITERAL_CHARACTER | "\\" ESCAPE_SEQUENCE;
+//	SINGLE_REGULAR_STRING_LITERAL_CHARACTER | '\\' ESCAPE_SEQUENCE;
 //
 //terminal VERBATIM_STRING_CHARACTER:
 //	SINGLE_VERBATIM_STRING_LITERAL_CHARACTER | QUOTE_ESCAPE_SEQUENCE;
@@ -167,11 +172,11 @@ terminal BOOL_LITERAL:
 //	ASCII_CHAR | !('0022');
 //
 //terminal QUOTE_ESCAPE_SEQUENCE:
-//	'""';
-//
-//terminal NULL_LITERAL:
-//	"null";
-//
+//	'''';
+
+terminal NULL_LITERAL:
+	'null';
+
 /* OPERATOR AND PUNCTUATOR A.1.9 ------------------------------------------------- */
 terminal OPERATOR_OR_PUNCTUATOR:
 	'{' | '}' | '[' | ']' | '(' | ')' | '.' | ',' | ':' | ';' | '+' | '-' | '*' | '/' | '%' | '&' | '|' | '^' | '!' | '~'
@@ -181,8 +186,8 @@ terminal OPERATOR_OR_PUNCTUATOR:
 /* PRE-PROCESSING DIRECTIVES A.1.10 ----------------------------------------------- */
 
 PP_DIRECTIVE:
-    PP_DECLARATION |
-    PP_CONDITIONAL;
+    PP_DECLARATION;
+//    PP_CONDITIONAL;
 //     | pp-line |
 //    pp-diagnostic |
 //    pp-region;
@@ -193,97 +198,97 @@ PP_NEW_LINE:
 CONDITIONAL_SYMBOL:
     KEYWORD | ID;
 
-PP_EXPRESSION:
-    WS2? PP_OR_EXPRESSION WS2?;
-
-PP_OR_EXPRESSION:
-    PP_AND_EXPRESSION |
-    PP_OR_EXPRESSION WS2? "||" WS2? PP_AND_EXPRESSION;
-
-PP_AND_EXPRESSION:
-    PP_EQUALITY_EXPRESSION |
-    PP_AND_EXPRESSION WS2? "&&" WS2? PP_EQUALITY_EXPRESSION;
-
-PP_EQUALITY_EXPRESSION:
-    PP_UNARY_EXPRESSION |
-    PP_EQUALITY_EXPRESSION WS2? "==" WS2? PP_UNARY_EXPRESSION |
-    PP_EQUALITY_EXPRESSION WS2? "!=" WS2? PP_UNARY_EXPRESSION;
-
-PP_UNARY_EXPRESSION:
-    PP_PRIMARY_EXPRESSION |
-    "!" WS? PP_UNARY_EXPRESSION;
-
-PP_PRIMARY_EXPRESSION:
-    "true" |
-    "false" |
-     CONDITIONAL_SYMBOL |
-    "(" WS2? PP_EXPRESSION WS2? ")";
+//PP_EXPRESSION:
+//    WS2? PP_OR_EXPRESSION WS2?;
+//
+//PP_OR_EXPRESSION:
+//    PP_AND_EXPRESSION |
+//    PP_OR_EXPRESSION WS2? '||' WS2? PP_AND_EXPRESSION;
+//
+//PP_AND_EXPRESSION:
+//    PP_EQUALITY_EXPRESSION |
+//    PP_AND_EXPRESSION WS2? '&&' WS2? PP_EQUALITY_EXPRESSION;
+//
+//PP_EQUALITY_EXPRESSION:
+//    PP_UNARY_EXPRESSION |
+//    PP_EQUALITY_EXPRESSION WS2? '==' WS2? PP_UNARY_EXPRESSION |
+//    PP_EQUALITY_EXPRESSION WS2? '!=' WS2? PP_UNARY_EXPRESSION;
+//
+//PP_UNARY_EXPRESSION:
+//    PP_PRIMARY_EXPRESSION |
+//    '!' WS2? PP_UNARY_EXPRESSION;
+//
+//PP_PRIMARY_EXPRESSION:
+//    'true' |
+//    'false' |
+//     CONDITIONAL_SYMBOL |
+//    '(' WS2? PP_EXPRESSION WS2? ')';
 
 PP_DECLARATION:
     (WS2? '#' WS2? 'define' WS2 CONDITIONAL_SYMBOL PP_NEW_LINE) |
     (WS2? '#' WS2? 'undef' WS2 CONDITIONAL_SYMBOL PP_NEW_LINE);
 
-PP_ELIF_SECTION:
-    WS2? "#" WS2? "elif" WS2 PP_EXPRESSION PP_NEW_LINE CONDITIONAL_SECTION?;
+//PP_ELIF_SECTION:
+//    WS2? '#' WS2? 'elif' WS2 PP_EXPRESSION PP_NEW_LINE CONDITIONAL_SECTION?;
     
 // ====> REGRA COM RECURSAO A ESQUERDA    
 //PP_ELIF_SECTIONS: 
 //    PP_ELIF_SECTION |
 //    PP_ELIF_SECTIONS PP_ELIF_SECTION;
 
-PP_ELIF_SECTIONS:
-	PP_ELIF_SECTION PP_ELIF_SECTIONS_LINE;
+//PP_ELIF_SECTIONS:
+//	PP_ELIF_SECTION PP_ELIF_SECTIONS_LINE;
+//
+//PP_ELIF_SECTIONS_LINE:
+//   (PP_ELIF_SECTION PP_ELIF_SECTIONS_LINE)?;
+//   
+//PP_CONDITIONAL:
+//    PP_IF_SECTION PP_ELIF_SECTIONS? PP_ELSE_SECTION? PP_ENDIF;
+//
+//PP_IF_SECTION:
+//    WS2? '#' WS2? 'if' WS2 PP_EXPRESSION PP_NEW_LINE CONDITIONAL_SECTION?;
+//
+//PP_ELSE_SECTION:
+//    WS2? '#' WS2? 'else' PP_NEW_LINE CONDITIONAL_SECTION?;
+//
+//PP_ENDIF:
+//    WS2? '#' WS2? 'endif' PP_NEW_LINE;
 
-PP_ELIF_SECTIONS_LINE:
-   (PP_ELIF_SECTION PP_ELIF_SECTIONS_LINE)?;
-   
-PP_CONDITIONAL:
-    PP_IF_SECTION PP_ELIF_SECTIONS? PP_ELSE_SECTION? PP_ENDIF;
-
-PP_IF_SECTION:
-    WS2? "#" WS2? "if" WS2 PP_EXPRESSION PP_NEW_LINE CONDITIONAL_SECTION?;
-
-PP_ELSE_SECTION:
-    WS2? "#" WS2? "else" PP_NEW_LINE CONDITIONAL_SECTION?;
-
-PP_ENDIF:
-    WS2? "#" WS2? "endif" PP_NEW_LINE;
-
-CONDITIONAL_SECTION:
-    INPUT_SECTION_PART+ |
-    SKIPPED_SECTION_PART+;
-
-SKIPPED_SECTION_PART:
-    SKIPPED_CHARACTERS? NEW_LINE_CHARACTER |
-    PP_DIRECTIVE;
-
-SKIPPED_CHARACTERS:
-    WS2? NOT_NUMBER_SIGN INPUT_CHARACTER*;
-
-NOT_NUMBER_SIGN:
-    Any INPUT_CHARACTER except #;
+//CONDITIONAL_SECTION:
+//    INPUT_SECTION_PART+ |
+//    SKIPPED_SECTION_PART+;
+//
+//SKIPPED_SECTION_PART:
+//    SKIPPED_CHARACTERS? NEW_LINE_CHARACTER |
+//    PP_DIRECTIVE;
+//
+//SKIPPED_CHARACTERS:
+//    WS2? NOT_NUMBER_SIGN INPUT_CHARACTER*;
+//
+//NOT_NUMBER_SIGN:
+//    Any INPUT_CHARACTER except #;
 
 //pp-line:
-//    WS? "#" WS? "line" WS? line-indicator PP_NEW_LINE
+//    WS2? '#' WS2? 'line' WS2? line-indicator PP_NEW_LINE
 //
 //line-indicator:
-//    decimal-digit+ WS file-name
+//    decimal-digit+ WS2 file-name
 //    decimal-digit+
-//    "default"
+//    'default'
 //
 //file-name:
-//    '"' file-name-characters '"'
+//    ''' file-name-characters '''
 //
 //file-name-characters:
 //    file-name-character
 //    file-name-characters file-name-character
 //
 //file-name-character:
-//    Any character except " (U+0022), and NEW_LINE
+//    Any character except ' (U+0022), and NEW_LINE
 //
 //pp-diagnostic:
-//    WS? "#" WS? "error" WS? pp-message
-//    WS? "#" WS? "warning" WS? pp-message
+//    WS2? '#' WS2? 'error' WS2? pp-message
+//    WS2? '#' WS2? 'warning' WS2? pp-message
 //
 //pp-message:
 //    INPUT_CHARACTER* NEW_LINE
@@ -292,7 +297,627 @@ NOT_NUMBER_SIGN:
 //    pp-start-region CONDITIONAL_SECTION? pp-end-region
 //
 //pp-start-region:
-//    WS? "#" WS? "region" WS? pp-message
+//    WS2? '#' WS2? 'region' WS2? pp-message
 //
 //pp-end-region:
-//    WS? "#" WS? "endregion" WS? pp-message
+//    WS2? '#' WS2? 'endregion' WS2? pp-message
+
+
+/* -----------------------------------------------------------------------------------------------------
+ * SYNTATIC GRAMMAR ------------------------------------------------------------------------------------
+ * ----------------------------------------------------------------------------------------------------- /
+
+/* A.2.1 Basic concepts ---------------------------------------------------------------------- */
+
+//COMPILATION_UNIT:
+//    using-directive* global-attributes namespace-member-declaration*
+
+/* A.2.2 Types --------------------------------------------------------- */
+
+TYPE:
+    NON_ARRAY_TYPE RANK_SPECIFIER*;
+
+INTEGRAL_TYPE:
+    'sbyte' |
+    'byte' |
+    'short' |
+    'ushort' |
+    'int' |
+    'uint' |
+    'long' |
+    'ulong' |
+    'char';
+
+ARRAY_TYPE:
+    NON_ARRAY_TYPE RANK_SPECIFIER+;
+
+NON_ARRAY_TYPE:
+    //QUALIFIED_TYPE |
+    BUILT_IN_TYPE;
+
+BUILT_IN_TYPE:
+    INTEGRAL_TYPE |
+    //BUILT_IN_CLASS_TYPE |
+    'bool' |
+    'decimal' |
+    'float' |
+    'double';
+
+RANK_SPECIFIER:
+    '[' ','* ']';
+
+/* A.2.4 Expressions ------------------------------------- */
+
+//ARGUMENT:
+//    REF_OR_OUT? EXPRESSION;
+    
+//ARGUMENT_LIST:
+//    (ARGUMENT ',')*;
+
+terminal REF_OR_OUT:
+    'ref' |
+    'out';
+
+PRIMARY_EXPRESSION:
+    //'new' NON_ARRAY_TYPE '[' EXPRESSION_LIST ']' RANK_SPECIFIER* ARRAY_INITIALIZER? |
+    //'new' ARRAY_TYPE ARRAY_INITIALIZER |
+    LITERAL |
+    ID |
+    //'(' EXPRESSION ')' |
+    //PRIMARY_EXPRESSION '.' ID |
+    PREDEFINED_TYPE '.' ID |
+    //PRIMARY_EXPRESSION '(' ARGUMENT_LIST ')' |
+    //PRIMARY_EXPRESSION '[' EXPRESSION_LIST ']' |
+    'this' |
+    'base' '.' ID |
+    //'base' '[' EXPRESSION_LIST ']' |
+    //PRIMARY_EXPRESSION INCREMENT_DECREMENT |
+    //'new' TYPE '(' ARGUMENT_LIST ')' |
+    'typeof' '(' TYPE_OR_VOID ')';// |
+    //'checked' '(' EXPRESSION ')' |
+    //'unchecked' '(' EXPRESSION ')';
+
+INCREMENT_DECREMENT:
+    '++' |
+    '--';
+
+TYPE_OR_VOID:
+    TYPE |
+    'void';
+
+PREDEFINED_TYPE:
+    'bool' |
+    'byte' |
+    'char' |
+    'decimal' |
+    'double' |
+    'float' | 
+    'int' |
+    'long' |
+    'object' |
+    'sbyte' |
+    'short' |
+    'string' |
+    'uint' | 
+    'ulong' |
+    'ushort';
+
+//EXPRESSION_LIST:
+//    (EXPRESSION ',')+;
+
+UNARY_EXPRESSION:
+    EXPRESSION_UNARY_OPERATOR UNARY_EXPRESSION |
+    '(' TYPE ')' UNARY_EXPRESSION |
+    PRIMARY_EXPRESSION;
+
+EXPRESSION_UNARY_OPERATOR:
+    PLUS |
+    MINUS |
+    INCREMENT_DECREMENT |
+    '!' |
+    '~' | 
+    '*';
+
+ASSIGN_OPERATOR:
+    '=' |
+    '+=' |
+    '-=' |
+    '*=' |
+    '/=' |
+    '%=' |
+    '&=' |
+    '|=' |
+    '^=' |
+    '<<=' |
+    '>>=';
+
+EXPRESSION:
+//    EXPRESSION '?' EXPRESSION ':' EXPRESSION |
+//    EXPRESSION '||' EXPRESSION |
+//    EXPRESSION '&&' EXPRESSION |
+//    EXPRESSION BAR EXPRESSION |
+//    EXPRESSION '^' EXPRESSION |
+//    EXPRESSION AMPERSAND EXPRESSION |
+//    EXPRESSION EXPRESSION_EQUALITY_OPERATOR EXPRESSION |
+//    EXPRESSION EXPRESSION_RELATIONAL_OPERATOR EXPRESSION |
+//    EXPRESSION 'is' BUILT_IN_TYPE |
+//    EXPRESSION EXPRESSION_SHIFT_OPERATOR EXPRESSION |
+//    EXPRESSION PLUS EXPRESSION |
+//    EXPRESSION MINUS EXPRESSION |
+//    EXPRESSION '*' EXPRESSION |
+//    EXPRESSION '/' EXPRESSION |
+//    EXPRESSION '%' EXPRESSION |
+    UNA_EXP;
+
+UNA_EXP:
+	UNARY_EXPRESSION EXPRESSION_LINE_1;
+
+EXPRESSION_LINE_1:
+	(ASSIGN_OPERATOR EXPRESSION)?;
+
+BAR:
+    '|';
+
+AMPERSAND:
+    '&';
+
+EXPRESSION_EQUALITY_OPERATOR:
+    '==' | 
+    '!=';
+
+EXPRESSION_RELATIONAL_OPERATOR:
+    //LESS_THAN |
+    //GREATER_THAN |
+    '<=' |
+    '>=' |
+    'is' |
+    'as';
+
+EXPRESSION_SHIFT_OPERATOR:
+    '<<' |
+    '>>';
+
+PLUS:
+    '+';
+
+MINUS:
+    '-';
+    
+/* A.2.5 Statements -------------------------------------------------------------------------*/
+
+STATEMENT:
+//    labeled-STATEMENT
+    DECLARATION_STATEMENT;
+//    embedded-STATEMENT
+
+//embedded-STATEMENT:
+//    maybe-empty-block
+//    STATEMENT-expression ';'
+//    selection-STATEMENT
+//    iteration-STATEMENT
+//    jump-STATEMENT
+//    try-STATEMENT
+//    'checked' block
+//    'unchecked' block
+//    lock-STATEMENT
+//    using-STATEMENT
+//
+//maybe-empty-block:
+//    '{' STATEMENT* '}'
+//    ';'
+
+BLOCK:
+    '{' STATEMENT* '}';
+
+//labeled-STATEMENT:
+//    identifier ':' STATEMENT
+
+DECLARATION_STATEMENT:
+    LOCAL_VARIABLE_DECLARATION ';';// | 
+//    LOCAL_CONSTANT_DECLARATION ';';
+
+LOCAL_VARIABLE_DECLARATION:
+    TYPE (VARIABLE_DECLARATOR ',')+;
+
+//LOCAL_CONSTANT_DECLARATION:
+//    'const' TYPE (CONSTANT_DECLARATOR ',')+;
+//
+//CONSTANT_DECLARATOR:
+//    ID '=' EXPRESSION;
+
+//STATEMENT-expression:
+//    primary-expression '(' argument-list ')'
+//    'new' type '(' argument-list ')'
+//    unary-expression assignment-operator expression
+//    primary-expression increment-decrement
+//    increment-decrement primary-expression
+//
+//selection-STATEMENT:
+//    if-STATEMENT
+//    switch-STATEMENT
+//
+//if-STATEMENT:
+//    'if' '(' expression ')' embedded-STATEMENT else-part?
+//
+//else-part:
+//    'else' embedded-STATEMENT
+//
+//switch-STATEMENT:
+//    'switch' '(' expression ')' '{' switch-section* '}'
+//
+//switch-section:
+//    switch-label+ STATEMENT+
+//
+//switch-label:
+//    'case' expression ':'
+//    'default' ':'
+//
+//iteration-STATEMENT:
+//    while-STATEMENT
+//    do-STATEMENT
+//    for-STATEMENT
+//    foreach-STATEMENT
+//
+//while-STATEMENT:
+//    'while' '(' expression ')' embedded-STATEMENT
+//
+//do-STATEMENT:
+//    'do' embedded-STATEMENT 'while' '(' expression ')' ';'
+//
+//for-STATEMENT:
+//    'for' '(' for-initializer? ';' expression? ';' STATEMENT-expression-list? ')' embedded-STATEMENT
+//
+//for-initializer:
+//    LOCAL_VARIABLE_DECLARATION
+//    STATEMENT-expression-list
+//
+//STATEMENT-expression-list:
+//    { STATEMENT-expression ',' } +
+//
+//foreach-STATEMENT:
+//    'foreach' '(' type identifier 'in' expression ')' embedded-STATEMENT
+//
+//jump-STATEMENT:
+//    break-STATEMENT
+//    continue-STATEMENT
+//    goto-STATEMENT
+//    return-STATEMENT
+//    throw-STATEMENT
+//
+//break-STATEMENT:
+//    'break' ';'
+//
+//continue-STATEMENT:
+//    'continue' ';'
+//
+//goto-STATEMENT:
+//    'goto' identifier ';'
+//    'goto' 'case' expression ';'
+//    'goto' 'default' ';'
+//
+//return-STATEMENT:
+//    'return' expression? ';'
+//
+//throw-STATEMENT:
+//    'throw' expression? ';'
+//
+//try-STATEMENT:
+//    'try' block catch-clauses finally-clause?
+//    'try' block finally-clause
+//
+//catch-clauses:
+//    specific-catch-clause+ general-catch-clause?
+//    specific-catch-clause* general-catch-clause
+//
+//specific-catch-clause:
+//    'catch' '(' built-in-class-type identifier? ')' block
+//    'catch' '(' qualified-identifier identifier? ')' block
+//
+//built-in-class-type:
+//    'object'
+//    'string'
+//
+//general-catch-clause:
+//    'catch' block
+//
+//finally-clause:
+//    'finally' block
+//
+//lock-STATEMENT:
+//    'lock' '(' expression ')' embedded-STATEMENT
+//
+//using-STATEMENT:
+//    'using' '(' resource-acquisition ')' embedded-STATEMENT
+//
+//resource-acquisition:
+//    LOCAL_VARIABLE_DECLARATION
+//    expression
+//
+//namespace-declaration:
+//    'namespace' qualified-identifier namespace-body ';'?
+//
+//qualified-identifier:
+//    { identifier '.' } +
+//
+//namespace-body:
+//    '{' using-directive* namespace-member-declaration* '}'
+//
+//using-directive:
+//    'using' ( identifier '=' )? qualified-identifier ';'
+//
+//namespace-member-declaration:
+//    namespace-declaration
+//    type-declaration
+//
+//type-declaration:
+//    class-declaration
+//    struct-declaration
+//    interface-declaration
+//    enum-declaration
+//    delegate-declaration
+    
+/* A.2.6 Classes ------------------------------------------------------------------------- */
+
+//class-declaration:
+//    attributes class-modifier* 'class' identifier class-base? class-body ';'?
+//
+//class-modifier:
+//    'new'
+//    'public'
+//    'protected'
+//    'internal'
+//    'private'
+//    'abstract'
+//    'sealed'
+//
+//class-base:
+//    ':' qualified-identifier-list
+//    ':' built-in-class-type ( ',' qualified-identifier-list )?
+//
+//qualified-identifier-list:
+//    { qualified-identifier ',' } +
+//
+//class-body:
+//    '{' class-member-declaration* '}'
+//
+//class-member-declaration:
+//    constant-declaration
+//    field-declaration
+//    method-declaration
+//    property-declaration
+//    event-declaration
+//    indexer-declaration
+//    operator-declaration
+//    constructor-declaration
+//    destructor-declaration
+//    static-constructor-declaration
+//    type-declaration
+//
+//constant-declaration:
+//    attributes constant-modifier* 'const' type { constant-declarator ',' } + ';'
+//
+//constant-modifier:
+//    'new'
+//    'public'
+//    'protected'
+//    'internal'
+//    'private'
+//
+//constant-declarator:
+//
+//field-declaration:
+//    attributes field-modifier* type { VARIABLE_DECLARATOR ',' } + ';'
+//
+//field-modifier:
+//    'new'
+//    'public'
+//    'protected'
+//    'internal'
+//    'private'
+//    'static'
+//    'readonly'
+//    'volatile'
+
+VARIABLE_DECLARATOR:
+    ID |
+    ID '=' VARIABLE_INITIALIZER;
+
+VARIABLE_INITIALIZER:
+    EXPRESSION;
+    //array-initializer
+
+//method-declaration:
+//    method-header maybe-empty-block
+//
+//method-header:
+//    attributes method-modifier* type-or-void qualified-identifier '(' formal-parameter-list? ')'
+//
+//method-modifier:
+//    'new'
+//    'public'
+//    'protected'
+//    'internal'
+//    'private'
+//    'static'
+//    'virtual'
+//    'sealed'
+//    'override'
+//    'abstract'
+//    'extern'
+//
+//formal-parameter-list:
+//    fixed-parameters
+//    fixed-parameters ',' parameter-array
+//    parameter-array
+//
+//fixed-parameters:
+//    { fixed-parameter ',' } +
+//
+//fixed-parameter:
+//    attributes parameter-modifier? type identifier
+//
+//parameter-modifier:
+//    'ref'
+//    'out'
+//
+//parameter-array:
+//    attributes 'params' array-type identifier
+//
+//property-declaration:
+//    attributes property-modifier* type qualified-identifier '{' accessor-declarations '}'
+//
+//property-modifier:
+//    'new'
+//    'public'
+//    'protected'
+//    'internal'
+//    'private'
+//    'static'
+//    'virtual'
+//    'sealed'
+//    'override'
+//    'abstract'
+//    'extern'
+//
+//accessor-declarations:
+//    get-accessor-declaration set-accessor-declaration?
+//    set-accessor-declaration get-accessor-declaration?
+//
+//get-accessor-declaration:
+//    attributes 'get' maybe-empty-block
+//
+//set-accessor-declaration:
+//    attributes 'set' maybe-empty-block
+//
+//event-declaration:
+//    attributes event-modifier* 'event' type { VARIABLE_DECLARATOR ',' } + ';'
+//    attributes event-modifier* 'event' type qualified-identifier '{' event-accessor-declarations '}'
+//
+//event-modifier:
+//    'new'
+//    'public'
+//    'protected'
+//    'internal'
+//    'private'
+//    'static'
+//    'virtual'
+//    'sealed'
+//    'override'
+//    'abstract'
+//    'extern'
+//
+//event-accessor-declarations:
+//    add-accessor-declaration remove-accessor-declaration
+//    remove-accessor-declaration add-accessor-declaration
+//
+//add-accessor-declaration:
+//    attributes 'add' block
+//
+//remove-accessor-declaration:
+//    attributes 'remove' block
+//
+//indexer-declaration:
+//    attributes indexer-modifier* indexer-declarator '{' accessor-declarations '}'
+//
+//indexer-modifier:
+//    'new'
+//    'public'
+//    'protected'
+//    'internal'
+//    'private'
+//    'virtual'
+//    'sealed'
+//    'override'
+//    'abstract'
+//    'extern'
+//
+//indexer-declarator:
+//    type 'this' '[' formal-parameter-list ']'
+//    type qualified-identifier '.' 'this' '[' formal-parameter-list ']'
+//
+//operator-declaration:
+//    attributes operator-modifier+ operator-declarator maybe-empty-block
+//
+//operator-modifier:
+//    'public'
+//    'static'
+//    'extern'
+//
+//operator-declarator:
+//    unary-operator-declarator
+//    binary-operator-declarator
+//    conversion-operator-declarator
+//
+//unary-operator-declarator:
+//    type 'operator' overloadable-unary-operator '(' type identifier ')'
+//
+//overloadable-unary-operator:
+//    plus
+//    minus
+//    increment-decrement
+//    '!'
+//    '~'
+//    'true'
+//    'false'
+//
+//binary-operator-declarator:
+//    type 'operator' overloadable-binary-operator '(' type identifier ',' type identifier ')'
+//
+//overloadable-binary-operator:
+//    plus
+//    minus
+//    '*'
+//    '/'
+//    '%'
+//    ampersand
+//    BAR
+//    '^'
+//    '<<'
+//    '>>'
+//    '=='
+//    '!='
+//    greater-than
+//    less-than
+//    '>='
+//    '<='
+//
+//greater-than:
+//    '>'
+//
+//less-than:
+//    '<'
+//
+//conversion-operator-declarator:
+//    conversion-kind 'operator' type '(' type identifier ')'
+//
+//conversion-kind:
+//    'implicit'
+//    'explicit'
+//
+//constructor-declaration:
+//    attributes constructor-modifier* constructor-declarator maybe-empty-block
+//
+//constructor-modifier:
+//    'public'
+//    'protected'
+//    'internal'
+//    'private'
+//    'extern'
+//
+//constructor-declarator:
+//    identifier '(' formal-parameter-list? ')' constructor-initializer?
+//
+//constructor-initializer:
+//    ':' 'base' '(' argument-list ')'
+//    ':' 'this' '(' argument-list ')'
+//
+//static-constructor-declaration:
+//    attributes static-constructor-modifiers identifier '(' ')' maybe-empty-block
+//
+//static-constructor-modifiers:
+//    'extern'? 'static'
+//    'static' 'extern'
+//
+//destructor-declaration:
+//    attributes 'extern'? '~' identifier '(' ')' maybe-empty-block
+    
