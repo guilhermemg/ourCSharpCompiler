@@ -10,22 +10,8 @@ Model:
 
 /* SYNTAX RULES (PRODUCTION RULES) ------------------------------------------ */
 
-//Greeting hidden(WS2, ML_COMMENT, SL_COMMENT):
-//	'Hello' name=ID '!' PROFILE;
-
 ProRule1:
-	(INPUT);
-
-	//terminal COMPOSE_ID :
-//	'comp_id' ID.ID.ID.ID
-//;
-
-/* REGRAS DE CONTROLE ------------------------------------------------------- */
-//terminal PROFILE:
-//	((ASCII_CHAR | DIGIT) (ASCII_CHAR | DIGIT) '.' (ASCII_CHAR | DIGIT) (ASCII_CHAR | DIGIT));
-
-//terminal DIGIT:
-//	('0'..'9')*;
+	INPUT;
 
 /* REGRA BASE ---------------------------------------------------------------- */
 terminal ASCII_CHAR: // RETURN A 2-DIGIT ASCII CHARACTER
@@ -36,7 +22,7 @@ INPUT:
 	INPUT_SECTION_PART;
 
 INPUT_SECTION_PART:
-	INPUT_ELEMENT* NEW_LINE_CHARACTER | PP_DIRECTIVE;
+	(INPUT_ELEMENT* NEW_LINE_CHARACTER) | PP_DIRECTIVE;
 
 INPUT_ELEMENT:
     WS2 |
@@ -45,11 +31,11 @@ INPUT_ELEMENT:
 
 /* WS2 - WHITESPACE */
 terminal WS2:
-	' '+;
+	' ';
 
 /* LINE TERMINATORS A.1.1 ------------------------------------------------*/
 terminal NEW_LINE_CHARACTER:
-	'\n' | 'r' | '\t';
+	('\n' | '\r' | '\t')+;
 
 ///* TOKEN A.1.4 ----------------------------------------------------------------- */
 TOKEN:
