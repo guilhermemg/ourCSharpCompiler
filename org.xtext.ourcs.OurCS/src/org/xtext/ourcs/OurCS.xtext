@@ -25,13 +25,13 @@ INPUT_SECTION_PART:
 	(INPUT_ELEMENT* NEW_LINE_CHARACTER) | PP_DIRECTIVE;
 
 INPUT_ELEMENT:
-    WS2 |
+    (WS2 |
     //COMMENT |
-    TOKEN;
+    TOKEN);
 
 /* WS2 - WHITESPACE */
 terminal WS2:
-	' ';
+	(' ')+;
 
 /* LINE TERMINATORS A.1.1 ------------------------------------------------*/
 terminal NEW_LINE_CHARACTER:
@@ -39,11 +39,11 @@ terminal NEW_LINE_CHARACTER:
 
 ///* TOKEN A.1.4 ----------------------------------------------------------------- */
 TOKEN:
-	ID | KEYWORD | //| INTEGER_LITERAL |
+	(ID | KEYWORD | //| INTEGER_LITERAL |
 //	REAL_LITERAL |
 //	CHARACTER_LITERAL |
 //	STRING_LITERAL |
-	OPERATOR_OR_PUNCTUATOR;
+	OPERATOR_OR_PUNCTUATOR);
 
 ///* UNICODE CHARACTER ESCAPE SEQUENCE A.1.5 ------------------------------------- */
 //terminal UNICODE_CHARACTER_ESCAPE_SEQUENCE:
