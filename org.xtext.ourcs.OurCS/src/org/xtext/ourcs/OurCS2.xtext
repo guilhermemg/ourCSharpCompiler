@@ -1,0 +1,104 @@
+grammar org.xtext.example.mydsl1.OurCS2 with org.eclipse.xtext.common.Terminals
+
+generate ourCS2 "http://www.xtext.org/example/mydsl1/OurCS2"
+
+Model:
+//	greetings+=Greeting*;
+	proRule1+=ProRule1*;
+	
+	
+ProRule1:
+	INPUT;
+	
+INPUT:
+	SIMPLE_STMT_DECLARATION |
+	ASSIGN_STMT
+;
+
+//TIPES---------------------------------------------------------------------
+
+PREDEFINED_TYPE:
+    'bool' |
+    'byte' |
+    'char' |
+    'decimal' |
+    'double' |
+    'float' | 
+    'int' |
+    'long' |
+    'object' |
+    'sbyte' |
+    'short' |
+    'string' |
+    'uint' | 
+    'ulong' |
+    'ushort';
+
+    
+//LITERAL------------------------------------------------------------------
+terminal BOOL_LITERAL:
+	'true' |
+	'false';
+
+terminal NULL_LITERAL:
+	'null';
+
+INT_LITERAL:
+	INT
+;
+
+STRING_LITERAL:
+	STRING
+;
+
+LITERAL:
+	BOOL_LITERAL|
+	NULL_LITERAL|
+	INT_LITERAL|
+	STRING_LITERAL
+	
+;
+
+
+
+//EXPRESSIOIN----------------------------------------------------------
+ASSIGN_OPERATOR:
+    '=' |
+    '+=' |
+    '-=' |
+    '*=' |
+    '/=' |
+    '%=' |
+    '&=' |
+    '|=' |
+    '^=' |
+    '<<=' |
+    '>>=';
+
+EXPRESSION:
+	COND_EXPRESSION
+;
+
+EXPRESSION_LINE:
+	('||' EXPRESSION) |
+	('&&' EXPRESSION)
+;
+
+COND_EXPRESSION:
+	EXPRESSION_LINE
+;
+
+//ASSIGN----------------------------------------------------------------------
+ASSIGN_STMT:
+	PREDEFINED_TYPE name=ID ASSIGN_OPERATOR LITERAL ';'
+;
+
+SIMPLE_STMT_DECLARATION:
+	PREDEFINED_TYPE name=ID ';'
+;
+
+SIMPLE_COND_STMT_ASSIGN:
+	PREDEFINED_TYPE name=ID ASSIGN_OPERATOR EXPRESSION ';'
+;
+
+
