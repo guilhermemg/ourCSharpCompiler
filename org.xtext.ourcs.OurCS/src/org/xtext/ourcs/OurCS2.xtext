@@ -12,10 +12,14 @@ ProRule1:
 	
 INPUT:
 	SIMPLE_STMT_DECLARATION |
-	ASSIGN_STMT
+	ASSIGN_STMT |
+	SIMPLE_COND_STMT_ASSIGN
 ;
 
 //TIPES---------------------------------------------------------------------
+
+
+
 
 PREDEFINED_TYPE:
     'bool' |
@@ -36,11 +40,11 @@ PREDEFINED_TYPE:
 
     
 //LITERAL------------------------------------------------------------------
-terminal BOOL_LITERAL:
+BOOL_LITERAL:
 	'true' |
 	'false';
 
-terminal NULL_LITERAL:
+NULL_LITERAL:
 	'null';
 
 INT_LITERAL:
@@ -62,6 +66,9 @@ LITERAL:
 
 
 //EXPRESSIOIN----------------------------------------------------------
+
+
+
 ASSIGN_OPERATOR:
     '=' |
     '+=' |
@@ -75,18 +82,115 @@ ASSIGN_OPERATOR:
     '<<=' |
     '>>=';
 
+TYPE:
+    NON_ARRAY_TYPE RANK_SPECIFIER*;
+
+NON_ARRAY_TYPE:
+    //QUALIFIED_TYPE |
+    BUILT_IN_TYPE;
+
+INTEGRAL_TYPE:
+    'sbyte' |
+    'byte' |
+    'short' |
+    'ushort' |
+    'int' |
+    'uint' |
+    'long' |
+    'ulong' |
+    'char';
+
+
+BUILT_IN_TYPE:
+    INTEGRAL_TYPE |
+    //BUILT_IN_CLASS_TYPE |
+    'bool' |
+    'decimal' |
+    'float' |
+    'double';
+
+RANK_SPECIFIER:
+    '[' ','* ']';
+    
+
+
+PRIMARY_EXPRESSION:
+    //'new' NON_ARRAY_TYPE '[' EXPRESSION_LIST ']' RANK_SPECIFIER* ARRAY_INITIALIZER? |
+    //'new' ARRAY_TYPE ARRAY_INITIALIZER |
+    LITERAL |
+    ID |
+    //'(' EXPRESSION ')' |
+    //PRIMARY_EXPRESSION '.' ID |
+    PREDEFINED_TYPE '.' ID |
+    //PRIMARY_EXPRESSION '(' ARGUMENT_LIST ')' |
+    //PRIMARY_EXPRESSION '[' EXPRESSION_LIST ']' |
+    'this' |
+    'base' '.' ID 
+    //'base' '[' EXPRESSION_LIST ']' |
+    //PRIMARY_EXPRESSION INCREMENT_DECREMENT |
+    //'new' TYPE '(' ARGUMENT_LIST ')' |
+    //'typeof' '(' TYPE_OR_VOID ')';// |
+    //'checked' '(' EXPRESSION ')' |
+    //'unchecked' '(' EXPRESSION ')';
+;
+
+EXPRESSION_LIST:
+	(EXPRESSION ',')+
+;
+
 EXPRESSION:
-	COND_EXPRESSION
+	COND_EXPRESSION |
+	UNA_EXP
 ;
 
 EXPRESSION_LINE:
 	('||' EXPRESSION) |
-	('&&' EXPRESSION)
+	('&&' EXPRESSION) 
+
+	
 ;
+
+BAR:
+    '|';
+
+AMPERSAND:
+    '&';
 
 COND_EXPRESSION:
 	EXPRESSION_LINE
 ;
+    
+
+
+INCREMENT_DECREMENT:
+    '++' |
+    '--';
+
+UNA_EXP:
+	UNARY_EXPRESSION EXPRESSION_LINE_1;
+
+EXPRESSION_LINE_1:
+	(ASSIGN_OPERATOR EXPRESSION)?;
+
+
+UNARY_EXPRESSION:
+    EXPRESSION_UNARY_OPERATOR UNARY_EXPRESSION |
+    '(' TYPE ')' UNARY_EXPRESSION |
+    PRIMARY_EXPRESSION;
+
+EXPRESSION_UNARY_OPERATOR:
+    PLUS |
+    MINUS |
+    INCREMENT_DECREMENT |
+    '!' |
+    '~' | 
+    '*';
+
+PLUS:
+    '+';
+
+MINUS:
+    '-';
 
 //ASSIGN----------------------------------------------------------------------
 ASSIGN_STMT:
