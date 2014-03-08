@@ -5,168 +5,126 @@ generate ourCS2 "http://www.xtext.org/example/mydsl1/OurCS2"
 Model:
 //	greetings+=Greeting*;
 	proRule1+=ProRule1*;
-	
-	
+
 ProRule1:
 	INPUT;
-	
+
 INPUT:
-	SIMPLE_STMT_DECLARATION |
-	ASSIGN_STMT |
-	SIMPLE_COND_STMT_ASSIGN
-;
+	STATEMENT;
 
-//TIPES---------------------------------------------------------------------
-
-
-
+	//TYPES_____________________________________________________________________
 
 PREDEFINED_TYPE:
-    'bool' |
-    'byte' |
-    'char' |
-    'decimal' |
-    'double' |
-    'float' | 
-    'int' |
-    'long' |
-    'object' |
-    'sbyte' |
-    'short' |
-    'string' |
-    'uint' | 
-    'ulong' |
-    'ushort';
+	'bool' | 'byte' | 'char' | 'decimal' | 'double' | 'float' | 'int' | 'long' | 'object' | 'sbyte' | 'short' | 'string'
+	| 'uint' | 'ulong' | 'ushort';
 
-    
-//LITERAL------------------------------------------------------------------
+	//LITERAL__________________________________________________________________
 BOOL_LITERAL:
-	'true' |
-	'false';
+	'true' | 'false';
 
 NULL_LITERAL:
 	'null';
 
 INT_LITERAL:
-	INT
-;
+	INT;
 
 STRING_LITERAL:
-	STRING
-;
+	STRING;
 
 LITERAL:
-	BOOL_LITERAL|
-	NULL_LITERAL|
-	INT_LITERAL|
-	STRING_LITERAL
-	
-;
+	BOOL_LITERAL | NULL_LITERAL | INT_LITERAL | STRING_LITERAL;
 
-
-
-//EXPRESSIOIN----------------------------------------------------------
-
-
+	//EXPRESSIOIN__________________________________________________________
 
 ASSIGN_OPERATOR:
-    '=' |
-    '+=' |
-    '-=' |
-    '*=' |
-    '/=' |
-    '%=' |
-    '&=' |
-    '|=' |
-    '^=' |
-    '<<=' |
-    '>>=';
+	'=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=' 
+	| INCREMENT_DECREMENT;
+
+REL_EXPRESSOIN:
+	'==' |
+	'!=' |
+	'<=' |
+	'>=' |
+	'<' |
+	'>'
+;
+
+BOOL_OPERATORS:
+	'||' |
+	'&&' |
+	BAR |
+	AMPERSAND 
+;
 
 TYPE:
-    NON_ARRAY_TYPE RANK_SPECIFIER*;
+	NON_ARRAY_TYPE RANK_SPECIFIER*;
 
 NON_ARRAY_TYPE:
-    //QUALIFIED_TYPE |
-    BUILT_IN_TYPE;
+//QUALIFIED_TYPE |
+	BUILT_IN_TYPE;
 
 INTEGRAL_TYPE:
-    'sbyte' |
-    'byte' |
-    'short' |
-    'ushort' |
-    'int' |
-    'uint' |
-    'long' |
-    'ulong' |
-    'char';
-
+	'sbyte' |
+	'byte' |
+	'short' |
+	'ushort' |
+	'int' |
+	'uint' |
+	'long' |
+	'ulong' |
+	'char';
 
 BUILT_IN_TYPE:
-    INTEGRAL_TYPE |
-    //BUILT_IN_CLASS_TYPE |
-    'bool' |
-    'decimal' |
-    'float' |
-    'double';
+	INTEGRAL_TYPE |
+	//BUILT_IN_CLASS_TYPE |
+	'bool' |
+	'decimal' |
+	'float' |
+	'double';
 
 RANK_SPECIFIER:
-    '[' ','* ']';
-    
-
+	'[' ','* ']';
 
 PRIMARY_EXPRESSION:
-    //'new' NON_ARRAY_TYPE '[' EXPRESSION_LIST ']' RANK_SPECIFIER* ARRAY_INITIALIZER? |
-    //'new' ARRAY_TYPE ARRAY_INITIALIZER |
-    LITERAL |
-    ID |
-    //'(' EXPRESSION ')' |
-    //PRIMARY_EXPRESSION '.' ID |
-    PREDEFINED_TYPE '.' ID |
-    //PRIMARY_EXPRESSION '(' ARGUMENT_LIST ')' |
-    //PRIMARY_EXPRESSION '[' EXPRESSION_LIST ']' |
-    'this' |
-    'base' '.' ID 
-    //'base' '[' EXPRESSION_LIST ']' |
-    //PRIMARY_EXPRESSION INCREMENT_DECREMENT |
-    //'new' TYPE '(' ARGUMENT_LIST ')' |
-    //'typeof' '(' TYPE_OR_VOID ')';// |
-    //'checked' '(' EXPRESSION ')' |
-    //'unchecked' '(' EXPRESSION ')';
+//'new' NON_ARRAY_TYPE '[' EXPRESSION_LIST ']' RANK_SPECIFIER* ARRAY_INITIALIZER? |
+//'new' ARRAY_TYPE ARRAY_INITIALIZER |
+	LITERAL | ID |
+	//'(' EXPRESSION ')' |
+	//PRIMARY_EXPRESSION '.' ID |
+	PREDEFINED_TYPE '.' ID |
+	//PRIMARY_EXPRESSION '(' ARGUMENT_LIST ')' |
+	//PRIMARY_EXPRESSION '[' EXPRESSION_LIST ']' |
+	'this' | 'base' '.' ID
+	//'base' '[' EXPRESSION_LIST ']' |
+	//PRIMARY_EXPRESSION INCREMENT_DECREMENT |
+	//'new' TYPE '(' ARGUMENT_LIST ')' |
+	//'typeof' '(' TYPE_OR_VOID ')';// |
+	//'checked' '(' EXPRESSION ')' |
+	//'unchecked' '(' EXPRESSION ')';
 ;
 
 EXPRESSION_LIST:
-	(EXPRESSION ',')+
-;
+	(EXPRESSION ',')+;
 
 EXPRESSION:
-	COND_EXPRESSION |
-	UNA_EXP
-;
+	COND_EXPRESSION | UNA_EXP;
 
 EXPRESSION_LINE:
-	(PRIMARY_EXPRESSION '||' EXPRESSION) |
-	(PRIMARY_EXPRESSION '&&' EXPRESSION) |
-	(PRIMARY_EXPRESSION BAR EXPRESSION) |
-    (PRIMARY_EXPRESSION '^' EXPRESSION) |
-    (PRIMARY_EXPRESSION AMPERSAND EXPRESSION)
-	
-;
+	(PRIMARY_EXPRESSION BOOL_OPERATORS EXPRESSION) |
+	(PRIMARY_EXPRESSION '^' EXPRESSION) | (PRIMARY_EXPRESSION REL_EXPRESSOIN EXPRESSION) 
+	 ;
 
 BAR:
-    '|';
+	'|';
 
 AMPERSAND:
-    '&';
+	'&';
 
 COND_EXPRESSION:
-	EXPRESSION_LINE
-;
-    
-
+	EXPRESSION_LINE;
 
 INCREMENT_DECREMENT:
-    '++' |
-    '--';
+	'++' | '--';
 
 UNA_EXP:
 	UNARY_EXPRESSION EXPRESSION_LINE_1;
@@ -174,37 +132,53 @@ UNA_EXP:
 EXPRESSION_LINE_1:
 	(ASSIGN_OPERATOR EXPRESSION)?;
 
-
 UNARY_EXPRESSION:
-    EXPRESSION_UNARY_OPERATOR UNARY_EXPRESSION |
-    '(' TYPE ')' UNARY_EXPRESSION |
-    PRIMARY_EXPRESSION;
+	EXPRESSION_UNARY_OPERATOR UNARY_EXPRESSION | '(' TYPE ')' UNARY_EXPRESSION | PRIMARY_EXPRESSION;
 
 EXPRESSION_UNARY_OPERATOR:
-    PLUS |
-    MINUS |
-    INCREMENT_DECREMENT |
-    '!' |
-    '~' | 
-    '*';
+	PLUS | MINUS | INCREMENT_DECREMENT | '!' | '~' | '*';
 
 PLUS:
-    '+';
+	'+';
 
 MINUS:
-    '-';
+	'-';
 
-//ASSIGN----------------------------------------------------------------------
+/* A.2.5 Statements _________________________________________________________________________*/
 ASSIGN_STMT:
-	PREDEFINED_TYPE name=ID ASSIGN_OPERATOR LITERAL ';'
-;
+	(PREDEFINED_TYPE name=ID ASSIGN_OPERATOR LITERAL ';') | 
+	(name=ID LITERAL ASSIGN_OPERATOR);
 
 SIMPLE_STMT_DECLARATION:
-	PREDEFINED_TYPE name=ID ';'
-;
+	PREDEFINED_TYPE name=ID ';';
 
 SIMPLE_COND_STMT_ASSIGN:
-	PREDEFINED_TYPE name=ID ASSIGN_OPERATOR EXPRESSION ';'
+	PREDEFINED_TYPE name=ID ASSIGN_OPERATOR EXPRESSION ';';
+
+EMBEDDED_STATEMENT:
+	ASSIGN_STMT
+	//	'checked' BLOCK |
+	//    'unchecked' BLOCK
 ;
 
+IF_STATEMENT:
+	'if' '(' EXPRESSION ')' BLOCK location=ELSE_PART?;
 
+ELSE_PART:
+	'else' BLOCK;
+
+STATEMENT:
+	ASSIGN_STMT | SIMPLE_STMT_DECLARATION | SIMPLE_COND_STMT_ASSIGN | IF_STATEMENT | ITERATION_STATEMENT;
+
+BLOCK:
+	"{" location=STATEMENT* "}";
+
+ITERATION_STATEMENT:
+//    WHILE_STATEMENT
+//    DO_STATEMENT
+	FOR_STATEMENT
+	//    FOREACH_STATEMENT
+;
+
+FOR_STATEMENT:
+	"for" "(" ASSIGN_STMT? COND_EXPRESSION ';' ASSIGN_STMT? ")" location=BLOCK;

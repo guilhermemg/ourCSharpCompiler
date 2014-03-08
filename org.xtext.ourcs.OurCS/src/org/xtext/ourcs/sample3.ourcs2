@@ -15,3 +15,18 @@ int a = a&b;
 decimal a = null;
 
 
+if (a && b) {
+	int c = 2 ;
+}
+
+if (a && b) {
+	int c = 2;
+} 
+else {
+	int c = 3;
+}
+
+
+for(int i = 0; i < 5; i++){
+	
+}
