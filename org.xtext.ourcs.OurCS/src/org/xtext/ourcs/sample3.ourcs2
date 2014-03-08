@@ -1,0 +1,17 @@
+bool hello;
+bool id = true;
+int a = false;
+int b = 30;
+string st = 'ssssdsda';
+int b += 2;
+bool x = false;
+string a = "asas";
+decimal a1 = -a;
+decimal a1 = (decimal) +a;
+decimal a1 = a && a;
+int a = f && d || z;
+decimal a = base.a;
+int a = a&b;
+decimal a = null;
+
+
