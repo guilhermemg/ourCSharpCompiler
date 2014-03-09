@@ -100,6 +100,14 @@ while ( a > v ) {
 
 try {
 	a = 2;
+	
+	a++;
+	++a;
+	
+	b--;
+	--b;
+	
+	b+=234;
 } 
 catch( string c ) { // specific catch block
 	a+=5;
@@ -114,3 +122,28 @@ finally {
 	decimal ja = 1;
 }
 
+// attributes and classes declaration ----------------------------------------------------------
+
+[
+	param : sdfd,
+	param : ksdd
+]
+public class C1;
+
+
+[
+	param : sdfdfd = 23
+]
+private class C2; 
+
+
+[
+	param : sdfdfd = 23,
+	field : AB(adf,sdf),
+	type: BB(123, 234, 345, 546)
+]
+protected class C2 {
+	
+	
+	int c = 123;
+} 
