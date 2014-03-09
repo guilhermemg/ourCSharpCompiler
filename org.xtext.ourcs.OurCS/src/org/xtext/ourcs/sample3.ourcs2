@@ -26,7 +26,22 @@ else {
 	int c = 3;
 }
 
-
 for(int i = 0; i < 5; i++){
-	
+	if(a || b){
+		int a = 0;
+	}else{
+		 int a = 1;
+	}
 }
+
+while(a || b){
+	int c = 10;
+	string ch = "ok";
+}
+
+do{
+	if(true){
+		int a = 40;
+	}
+	
+}while(a || b);

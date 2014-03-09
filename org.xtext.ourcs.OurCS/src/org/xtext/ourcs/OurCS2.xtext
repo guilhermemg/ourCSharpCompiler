@@ -147,7 +147,7 @@ MINUS:
 /* A.2.5 Statements _________________________________________________________________________*/
 ASSIGN_STMT:
 	(PREDEFINED_TYPE name=ID ASSIGN_OPERATOR LITERAL ';') | 
-	(name=ID LITERAL ASSIGN_OPERATOR);
+	(name=ID ASSIGN_OPERATOR);
 
 SIMPLE_STMT_DECLARATION:
 	PREDEFINED_TYPE name=ID ';';
@@ -174,11 +174,19 @@ BLOCK:
 	"{" location=STATEMENT* "}";
 
 ITERATION_STATEMENT:
-//    WHILE_STATEMENT
-//    DO_STATEMENT
+    WHILE_STATEMENT |
+    DO_STATEMENT |
 	FOR_STATEMENT
 	//    FOREACH_STATEMENT
 ;
 
 FOR_STATEMENT:
-	"for" "(" ASSIGN_STMT? COND_EXPRESSION ';' ASSIGN_STMT? ")" location=BLOCK;
+	'for' '(' ASSIGN_STMT? COND_EXPRESSION ';' ASSIGN_STMT? ')' location=BLOCK;
+	
+WHILE_STATEMENT:
+    'while' '(' COND_EXPRESSION ')' location=BLOCK
+;
+
+DO_STATEMENT:
+    'do' location=BLOCK 'while' '(' COND_EXPRESSION ')' ';'
+;
