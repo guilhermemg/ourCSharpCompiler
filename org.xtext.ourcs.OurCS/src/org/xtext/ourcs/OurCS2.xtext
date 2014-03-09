@@ -15,8 +15,8 @@ INPUT:
 	//TYPES_____________________________________________________________________
 
 PREDEFINED_TYPE:
-	'bool' | 'byte' | 'char' | 'decimal' | 'double' | 'float' | 'int' | 'long' | 'object' | 'sbyte' | 'short' | 'string'
-	| 'uint' | 'ulong' | 'ushort';
+	'bool' | 'byte' | 'char' | 'decimal' | 'double' | 'float' | 'int' | 'long' | 'object' | 'sbyte' | 'short' | 'string' |
+	'uint' | 'ulong' | 'ushort';
 
 	//LITERAL__________________________________________________________________
 BOOL_LITERAL:
@@ -37,24 +37,13 @@ LITERAL:
 	//EXPRESSIOIN__________________________________________________________
 
 ASSIGN_OPERATOR:
-	'=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=' 
-	| INCREMENT_DECREMENT;
+	'=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=' | INCREMENT_DECREMENT;
 
 REL_EXPRESSOIN:
-	'==' |
-	'!=' |
-	'<=' |
-	'>=' |
-	'<' |
-	'>'
-;
+	'==' | '!=' | '<=' | '>=' | '<' | '>';
 
 BOOL_OPERATORS:
-	'||' |
-	'&&' |
-	BAR |
-	AMPERSAND 
-;
+	'||' | '&&' | BAR | AMPERSAND | '%';
 
 TYPE:
 	NON_ARRAY_TYPE RANK_SPECIFIER*;
@@ -110,9 +99,8 @@ EXPRESSION:
 	COND_EXPRESSION | UNA_EXP;
 
 EXPRESSION_LINE:
-	(PRIMARY_EXPRESSION BOOL_OPERATORS EXPRESSION) |
-	(PRIMARY_EXPRESSION '^' EXPRESSION) | (PRIMARY_EXPRESSION REL_EXPRESSOIN EXPRESSION) 
-	 ;
+	(PRIMARY_EXPRESSION BOOL_OPERATORS EXPRESSION) | (PRIMARY_EXPRESSION '^' EXPRESSION) | (PRIMARY_EXPRESSION
+	REL_EXPRESSOIN EXPRESSION);
 
 BAR:
 	'|';
@@ -146,8 +134,8 @@ MINUS:
 
 /* A.2.5 Statements _________________________________________________________________________*/
 ASSIGN_STMT:
-	(PREDEFINED_TYPE name=ID ASSIGN_OPERATOR LITERAL ';') | 
-	(name=ID ASSIGN_OPERATOR);
+	(PREDEFINED_TYPE name=ID ASSIGN_OPERATOR LITERAL ';') | (name=ID ASSIGN_OPERATOR) | (name=ID ASSIGN_OPERATOR LITERAL
+	';');
 
 SIMPLE_STMT_DECLARATION:
 	PREDEFINED_TYPE name=ID ';';
@@ -155,38 +143,97 @@ SIMPLE_STMT_DECLARATION:
 SIMPLE_COND_STMT_ASSIGN:
 	PREDEFINED_TYPE name=ID ASSIGN_OPERATOR EXPRESSION ';';
 
-EMBEDDED_STATEMENT:
-	ASSIGN_STMT
-	//	'checked' BLOCK |
-	//    'unchecked' BLOCK
-;
-
 IF_STATEMENT:
 	'if' '(' EXPRESSION ')' BLOCK location=ELSE_PART?;
 
 ELSE_PART:
 	'else' BLOCK;
 
-STATEMENT:
-	ASSIGN_STMT | SIMPLE_STMT_DECLARATION | SIMPLE_COND_STMT_ASSIGN | IF_STATEMENT | ITERATION_STATEMENT;
+SWITCH_LABEL:
+	("case" EXPRESSION ":") | ("default" ":");
+
+SWITCH_SECTION:
+	SWITCH_LABEL+ location=STATEMENT+;
+
+SWITCH_STATEMENT:
+	"switch" "(" ID ")" "{" location=SWITCH_SECTION* "}";
 
 BLOCK:
 	"{" location=STATEMENT* "}";
 
 ITERATION_STATEMENT:
-    WHILE_STATEMENT |
-    DO_STATEMENT |
-	FOR_STATEMENT
+	WHILE_STATEMENT | DO_STATEMENT | FOR_STATEMENT
 	//    FOREACH_STATEMENT
 ;
 
 FOR_STATEMENT:
 	'for' '(' ASSIGN_STMT? COND_EXPRESSION ';' ASSIGN_STMT? ')' location=BLOCK;
-	
+
 WHILE_STATEMENT:
-    'while' '(' COND_EXPRESSION ')' location=BLOCK
-;
+	'while' '(' COND_EXPRESSION ')' location=BLOCK;
 
 DO_STATEMENT:
-    'do' location=BLOCK 'while' '(' COND_EXPRESSION ')' ';'
+	'do' location=BLOCK 'while' '(' COND_EXPRESSION ')' ';';
+
+JUMP_STATEMENT:
+    BREAK_STATEMENT |
+    CONTINUE_STATEMENT |
+    GOTO_STATEMENT |
+    RETURN_STATEMENT |
+    THROW_STATEMENT
 ;
+
+BREAK_STATEMENT:
+    "break" ";"
+;
+
+CONTINUE_STATEMENT:
+    "continue" ";"
+;    
+
+GOTO_STATEMENT:
+    ("goto" ID ";") |
+    ("goto" "case" COND_EXPRESSION ";") |
+    ("goto" "default" ";")
+;
+
+RETURN_STATEMENT:
+    "return" EXPRESSION? ";"
+;
+
+THROW_STATEMENT:
+    "throw" EXPRESSION? ";"
+;
+
+BUILT_IN_CLASS_TYPE:
+    "object" |
+    "string"
+;
+
+GENERAL_CATCH_CLAUSE:
+    "catch" BLOCK;
+
+SPECIFIC_CATCH_CLAUSE:
+    "catch" "(" BUILT_IN_CLASS_TYPE ID? ")" BLOCK
+;
+
+FINALLY_CLAUSE:
+    "finally" BLOCK;
+
+CATCH_CLAUSES:
+    //(location=SPECIFIC_CATCH_CLAUSE+ location=GENERAL_CATCH_CLAUSE?) |
+    (location=SPECIFIC_CATCH_CLAUSE* location=GENERAL_CATCH_CLAUSE)
+;
+
+TRY_STATEMENT_LINE:
+	(CATCH_CLAUSES location=FINALLY_CLAUSE?) |
+	(FINALLY_CLAUSE)
+;
+
+TRY_STATEMENT:
+    "try" BLOCK location=TRY_STATEMENT_LINE 
+;
+
+STATEMENT:
+	ASSIGN_STMT | SIMPLE_STMT_DECLARATION | SIMPLE_COND_STMT_ASSIGN | IF_STATEMENT | ITERATION_STATEMENT |
+	SWITCH_STATEMENT | JUMP_STATEMENT | TRY_STATEMENT;
