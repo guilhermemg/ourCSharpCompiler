@@ -10,9 +10,10 @@ ProRule1:
 	INPUT;
 
 INPUT:
-	STATEMENT;
+	STATEMENT |
+	CLASS_DECLARATION;
 
-	//TYPES_____________________________________________________________________
+//TYPES_____________________________________________________________________
 
 PREDEFINED_TYPE:
 	'bool' | 'byte' | 'char' | 'decimal' | 'double' | 'float' | 'int' | 'long' | 'object' | 'sbyte' | 'short' | 'string' |
@@ -37,7 +38,7 @@ LITERAL:
 	//EXPRESSIOIN__________________________________________________________
 
 ASSIGN_OPERATOR:
-	'=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=' | INCREMENT_DECREMENT;
+	'=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=';
 
 REL_EXPRESSOIN:
 	'==' | '!=' | '<=' | '>=' | '<' | '>';
@@ -93,7 +94,7 @@ PRIMARY_EXPRESSION:
 ;
 
 EXPRESSION_LIST:
-	(EXPRESSION ',')+;
+	EXPRESSION ','?;
 
 EXPRESSION:
 	COND_EXPRESSION | UNA_EXP;
@@ -134,8 +135,12 @@ MINUS:
 
 /* A.2.5 Statements _________________________________________________________________________*/
 ASSIGN_STMT:
-	(PREDEFINED_TYPE name=ID ASSIGN_OPERATOR LITERAL ';') | (name=ID ASSIGN_OPERATOR) | (name=ID ASSIGN_OPERATOR LITERAL
-	';');
+	(PREDEFINED_TYPE name=ID ASSIGN_OPERATOR LITERAL ';') | 
+	(name=ID INCREMENT_DECREMENT ';') |
+	(INCREMENT_DECREMENT name=ID ';') | 
+	(INCREMENT_DECREMENT name=ID) |
+	(name=ID INCREMENT_DECREMENT) |
+	(name=ID ASSIGN_OPERATOR LITERAL';');
 
 SIMPLE_STMT_DECLARATION:
 	PREDEFINED_TYPE name=ID ';';
@@ -237,3 +242,77 @@ TRY_STATEMENT:
 STATEMENT:
 	ASSIGN_STMT | SIMPLE_STMT_DECLARATION | SIMPLE_COND_STMT_ASSIGN | IF_STATEMENT | ITERATION_STATEMENT |
 	SWITCH_STATEMENT | JUMP_STATEMENT | TRY_STATEMENT;
+	
+
+// ATTRIBUTES -------------------------------------------------------------------
+
+ATTRIBUTES:
+    ATTRIBUTES_SECTION*;
+
+ATTRIBUTES_SECTION:
+    "[" ( ATTRIBUTE_TARGET ":" )? ATTRIBUTE_LIST "]";
+
+ATTRIBUTE_TARGET:
+    "field" |
+    "event" |
+    "method" |
+    "module" |
+    "param" |
+    "property" |
+    "return" |
+    "type";
+
+ATTRIBUTE_LIST:
+    ATTRIBUTE ','?;
+
+ATTRIBUTE:
+    ATTRIBUTE_NAME ATTRIBUTE_ARGUMENTS?;
+
+ATTRIBUTE_NAME:
+    ID;
+
+ATTRIBUTE_ARGUMENTS:
+    "(" EXPRESSION_LIST? ")";
+
+// classes ----------------------------------------------------------------------
+
+CLASS_DECLARATION:
+    ATTRIBUTES CLASS_MODIFIER* "class" ID /*CLASS_BASE? CLASS_BODY*/ ";"?;
+
+CLASS_MODIFIER:
+    "new" |
+    "public" |
+    "protected" |
+    "internal" |
+    "private" |
+    "abstract" |
+    "sealed";
+    
+//CLASS_BODY:
+//    "{" location=CLASS_MEMBER_DECLARATION* "}";
+//
+//CLASS_MEMBER_DECLARATION:
+//    CONSTANT_DECLARATION
+////    field-declaration |
+////    method-declaration |
+////    property-declaration |
+////    event-declaration |
+////    indexer-declaration |
+////    operator-declaration |
+////    constructor-declaration |
+////    destructor-declaration |
+////    static-constructor-declaration |
+////    type-declaration   
+//;
+//
+//CONSTANT_DECLARATION:
+//    ATTRIBUTES CONSTANT_MODIFIER* "const" ASSIGN_STMT;
+//
+//CONSTANT_MODIFIER:
+//    "new" |
+//    "public" |
+//    "protected" | 
+//    "internal" |
+//    "private";
+
+    
