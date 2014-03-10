@@ -1,0 +1,313 @@
+//using System;
+
+//namespace CSSoap {
+	  /// <summary>
+	  /// Summary description for Class1.
+	  /// </summary>
+	  class Class1 {
+    
+		    /// <summary>
+		    /// The main entry point for the application.
+		    /// </summary>
+		    [STAThread]
+		    static void Main(string[] args) {
+			      //
+			      // TODO: Add code to start application here
+			      //
+			      Class1 VZAServer = new Class1();
+			      
+			      try {
+			           VZAServer.Run();
+			      }
+			      catch(System.Web.Services.Protocols.SoapException ex) {
+				        Console.WriteLine(ex.Code.ToString() + ", " + ex.Message);
+				        Console.WriteLine("Details:" + ex.Detail.InnerText);
+			      }
+			      catch(System.Xml.XmlException xmlex) {
+			        	Console.WriteLine(xmlex.ToString());
+			      }
+			      catch(System.InvalidOperationException opex) {
+			        Console.WriteLine(opex.Message + "\n" + opex.InnerException);
+			      }
+			      Console.Read();
+    		}
+    
+    		private string m_sid;
+    		private string m_url;
+    		private long m_lastVEID;
+
+		    // Class, used as a Certificate policy provider and allowing all certificates
+		    public class TrustAllCertificatePolicy : System.Net.ICertificatePolicy {
+	  
+		      	  public TrustAllCertificatePolicy() {}
+	      
+				  public bool CheckValidationResult(System.Net.ServicePoint sp,
+				    System.Security.Cryptography.X509Certificates.X509Certificate cert,
+				    System.Net.WebRequest req, int problem) {
+				        // Trust everything
+			    	    return true;
+	      		}
+    		}
+
+	    // Main Function for our test.
+	    public void Run() {
+	      
+	      // Log in and store the resulting Session ID.
+	      // To login, you will need to use the password you were asked
+	      // to enter during the creation of the Service VPS on your
+	      // Virtuozzo node. For now, let's assume it's "mypassword" and
+	      // pass it as the last parameter to Login()
+	      
+	      m_url = "https://10.0.20.2:4646/";
+	      m_sid = Login(m_url, "vzagent0", "mypassword");
+	      Console.WriteLine("Session ID: " + m_sid);
+      
+	      // Fetch and write VPS list.
+	      Console.WriteLine();
+	      Console.WriteLine("VPS list:");
+	      Console.Write(FetchVPSList());
+      
+	      // Create a new VPS on a next available VEID and "vps.basic" sample.
+	      Console.WriteLine();
+	      Console.WriteLine("Creating VPS " + m_lastVEID.ToString() + " based on vps.basic sample.");
+	      Console.WriteLine(CreateVPS(m_lastVEID + 1, "vps.basic"));
+	      
+	      // Fetch and write VPS 101 and 102 configurations and statuses.
+	      long[] veids = {101, 102};
+	      Console.WriteLine();
+	      Console.WriteLine("VPS 101 and 102 configurations and statuses:");
+	      Console.Write(FetchVPSInfo(veids, false));
+	      
+	      // Start and stop VPS 102
+	      long[] startStopVeids = {102};
+	      Console.WriteLine();
+	      
+	      // Start VPS 102
+	      Console.WriteLine(StartVPS(startStopVeids[0]));
+	      
+	      //Check VPS 102 status
+	      Console.WriteLine("VPS 102 status:");
+	      Console.Write(FetchVPSInfo(startStopVeids, true));
+      
+	      //Stop VPS 102
+	      Console.WriteLine(StopVPS(startStopVeids[0]));
+	      
+	      // Check VPS 102 status
+	      Console.WriteLine("VPS 102 status:");
+	      Console.Write(FetchVPSInfo(startStopVeids, true));
+	      
+	      // Download files
+	      // Start VPS 102
+	      Console.WriteLine(StartVPS(startStopVeids[0]));
+	      
+	      // Download files "/etc/passwd" and "/etc/shadow" from VPS 102
+	      string[] files = {"/etc/passwd", "/etc/shadow"};
+	      Console.WriteLine("Downloading files");
+	      Console.WriteLine(DownloadFiles(102, files));
+    }
+    
+    // Function provides initial login to url with user and password
+    private string Login(string url, string user, string password) {
+	      // Allow any certificates.
+	      System.Net.ServicePointManager.CertificatePolicy = new
+	        TrustAllCertificatePolicy();
+	      
+	      // Create a class, providing access to TicketM Operator of VZAgent.
+	      VZA.ticketmBinding ticketm = new VZA.ticketmBinding();
+	      
+	      // Set up the server URL.
+	      ticketm.Url = url;
+	      
+	      // Set up login credentials, using Encoding.GetBytes to convert password into byte array.
+	      VZA.login loginCred = new VZA.login();
+	      System.Text.Encoding ascii = System.Text.Encoding.ASCII;
+	      loginCred.user = user;
+	      loginCred.password = ascii.GetBytes(password);
+	      
+	      // Use dummy packet header
+	      ticketm.packet_header = new VZA.packet_headerType();
+	      
+	      // Invoke the login command.
+	      VZA.loginResponse lr = ticketm.login(loginCred);
+	      
+	      // Return the resulting Session ID.
+	      return lr.ticket;
+    }
+    // Initialize new binding with Url and session ID.
+    private Object InitBinding(System.Type bindingType) {
+	      System.Object Binding = bindingType.GetConstructor(System.Type.EmptyTypes).Invoke(null);
+	    
+	      bindingType.GetProperty("Url").SetValue(Binding, m_url, null);
+	      VZA.packet_headerType header = new VZA.packet_headerType();
+	      header.session = m_sid;
+	      bindingType.GetField("packet_header").SetValue(Binding, header);
+	      return Binding;
+    }
+    
+    // Fetch VPS list
+    private string FetchVPSList() {
+	      // Initialize hwmBinding reflecting HWM Operator of VZAgent
+	      VZA.hwmBinding hwm = (VZA.hwmBinding)InitBinding(typeof(VZA.hwmBinding));
+	      
+	      // Retrieving list of VPSes for an empty list of VEID, which means to retrieve the whole list.
+	      VZA.list_ve lve = new VZA.list_ve();
+	      long[] lstve = hwm.list_ve(lve);
+	      // Serializing the resulting list into a string.
+	      String resp = "";
+	      for (int i = 0; i < lstve.Length; ++i)
+	      {
+	        resp += "VEID:" + lstve[i] + "\n";
+	      }
+	      // We'll remember last VEID for future use in CreateVPS method.
+	      m_lastVEID = lstve[lstve.Length -1];
+	      return resp;
+    }
+    
+    // Create VPS with VEID and based on specified VPS sample
+    private string CreateVPS(long veid, string VPSSampleName) {
+	      // Initialize vemBinding reflecting VEM Operator of VZAgent
+	      VZA.vemBinding vem = (VZA.vemBinding)InitBinding(typeof(VZA.vemBinding));
+	      // Parameters for VPS creation
+	      VZA.create1 param = new VZA.create1();
+	      param.veid = veid;
+	      param.veidSpecified = true;
+	      // Create based on a VPS sample with the specified name.
+	      param.Item = VPSSampleName;
+	      // Creating VPS
+	      VZA.createResponse1 result = vem.create(param);
+	      // We're ok if no exception was generated.
+	      return "VPS create operation returned OK";
+    }
+    
+    // Fetch VPS configurations and statuses
+    private string FetchVPSInfo(long[] veids, bool statusesOnly)
+    {
+	      // Initialize vemBinding reflecting VEM Operator of VZAgent
+	      VZA.vemBinding vem = (VZA.vemBinding)InitBinding(typeof(VZA.vemBinding));
+	      
+	      // Paremeters structure ve_info
+	      VZA.ve_info veinfo = new VZA.ve_info();
+	      
+	      if (!statusesOnly) {
+		        // Request to report whole configuration of VPS. There is a possibility to
+		        // narrow down the request set by specifying flags to "config" structure.
+		        veinfo.config = new VZA.ve_infoConfig();
+	      }
+	      else {
+		        veinfo.config = null; 
+	      }
+	      
+	      // Request to report VPS status.
+	      veinfo.status = new Object();
+	      
+	      // VEIDs of VPSes we'd like to get information for.
+	      veinfo.veid = veids;
+	      
+	      // The request itself. Result is stored into ves array.
+	      VZA.veType[] ves = vem.ve_info(veinfo);
+	      
+	      // Serialization of the result into a string. Not all available fields are
+	      // serialized in this example.
+	      String resp = "";
+	      for (int i = 0; i < ves.Length; i++)
+	      {
+		        VZA.veType ve = ves[i];
+		        String VEText;
+		        VEText = "VEID:"; VEText += ve.veid; VEText += "\n";
+		        if (!statusesOnly)
+		          VEText += "Hostname:" + ve.config.hostname + "\n";
+		        VEText += "State:"; VEText += ve.status.state; VEText += "\n";
+		        VEText += "Transition:"; VEText += ve.status.transition; VEText += "\n";
+		        
+		        if (!statusesOnly)
+		        {
+		          // Serialization of QOSes.
+		          for (int j = 0; j < ve.config.qos.Length; j++)
+		          {
+		            VZA.qosType qos = ve.config.qos[j];
+		            VEText += "QoS:"; VEText += qos.id;
+		            VEText += " Soft:"; VEText += qos.soft;
+		            VEText += " Hard:"; VEText += qos.hard;
+		            VEText += "\n";
+		          }
+		          VEText += "\n";
+		        }
+		        resp += VEText;
+	      }
+	      
+	      return resp;
+    }
+    
+    // Start VPS with specified VEID.
+    private string StartVPS(long veid)
+    {
+	      // Initialize vemBinding reflecting VEM Operator of VZAgent
+	      VZA.vemBinding vem = (VZA.vemBinding)InitBinding(typeof(VZA.vemBinding));
+	      // Paremeters structure
+	      VZA.start param = new VZA.start();
+	      // Set up the veid
+	      param.veid = veid;
+	      // Start VPS
+	      VZA.startResponse2 result = vem.start(param);
+	      // We're ok if no exception was generated.
+	      return "VPS start operation returned OK";
+    }
+    
+    // Stop VPS with specified VEID
+    private string StopVPS(long veid)
+    {
+	      // Initialize vemBinding reflecting VEM Operator of VZAgent
+	      VZA.vemBinding vem = (VZA.vemBinding)InitBinding(typeof(VZA.vemBinding));
+	      // Paremeters structure
+	      VZA.stop param = new VZA.stop();
+	      // Set up the veid
+	      param.veid = veid;
+	      // Stop VPS
+	      VZA.stopResponse2 result = vem.stop(param);
+	      // We're ok if no exception was generated.
+	      return "VPS stop operation returned OK";
+    }
+
+    // Download files from specified VPS
+    private string DownloadFiles(long veid, string[] paths)
+    {
+	      // Initialize vemBinding reflecting VEM Operator of VZAgent
+	      VZA.filemBinding filem = (VZA.filemBinding)InitBinding(typeof(VZA.filemBinding));
+	      
+	      // Paremeters structure.
+	      VZA.download files = new VZA.download();
+	      
+	      // Set up the veid of VPS, we're downloading files from.
+	      files.veid = veid;
+	      
+	      // We'll be downloading in Packet Mode.
+	      files.packet_mode = new Object();
+	      
+	      // Initialize list of files structures.
+	      files.file = new VZA.downloadFile[paths.Length];
+	      
+	      System.Text.Encoding ascii = System.Text.Encoding.ASCII;
+	      
+	      for (int n = 0; n < paths.Length; n++)
+	      {
+	        files.file[n] = new VZA.downloadFile();
+	        // Conversion from string to array of bytes.
+	        files.file[n].path = ascii.GetBytes(paths[n]);
+	      }
+      
+	      // Downloading the files.
+	      VZA.fileType[] content = filem.download(files);
+	      
+	      // Serializing the result.
+	      String resp = "";
+	      for (int n = 0; n < paths.Length; n++)
+	      {
+		        resp += "File : " + paths[n] + "\n";
+		        resp += ascii.GetString(content[n].body);
+		        resp += "\n";
+	      }
+	      
+	      return resp;
+    }
+  }
+//}
