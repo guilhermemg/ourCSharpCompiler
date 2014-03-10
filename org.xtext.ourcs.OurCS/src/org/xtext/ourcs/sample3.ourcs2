@@ -1,19 +1,32 @@
-// assignment statements -------------------------------------------------------
+// variable declaration ----------------------------------------------------------
 
 bool hello;
+int a;
+double b;
+short c;
+float k;
+string s;
+object obj;
+
+// assignment statements -------------------------------------------------------
+
 bool id = true;
 int a = false;
 int b = 30;
 string st = 'ssssdsda';
-int b += 2;
 bool x = false;
-string a = "asas";
+
+int b += 2;
 decimal a1 = -a;
 decimal a1 = (decimal) +a;
+bool x = y == a;
+
 decimal a1 = a && a;
+
 int a = f && d || z;
+
 decimal a = base.a;
-int a = a&b;
+int a = a & b;
 decimal a = null;
 
 // if else statements --------------------------------------------------------
@@ -34,7 +47,7 @@ else {
 for(int i = 0; i < 5; i++) {
 	if(a || b){
 		int a = 0;
-	} else{
+	} else {
 		if (a == b) {
 		 	a = 1;
 		 }
@@ -76,7 +89,7 @@ for (int i = 0; i < 10; i++) {
 	if(i == 2) { 
 		continue;
 	}
-	if(i == 8) {
+	if(i == 8444) {
 		 break;
 	}
 	if(i % 5 == 0) {
@@ -124,26 +137,40 @@ finally {
 
 // attributes and classes declaration ----------------------------------------------------------
 
-[
-	param : sdfd,
-	param : ksdd
-]
-public class C1;
+[ param : sdfd, ksdd ]
+public abstract class C1 {
+	const int a = 213;
+};
 
+[ param : sdfdfd, asdf ]
+[ field: sdfsdf, sdfsndf, sdsfd]
+private class C2 {
+	const string str = "AAAAAA";
+}; 
 
-[
-	param : sdfdfd = 23
-]
-private class C2; 
-
-
-[
-	param : sdfdfd = 23,
-	field : AB(adf,sdf),
-	type: BB(123, 234, 345, 546)
-]
-protected class C2 {
+[ param : sdfdfd ]
+[ field : AB(adf, sdf), BB(32, 55, "sdfsdf") ]
+[ type: BB(123, 234, 345, 546) ]
+protected internal class C3 {
+	const ushort aa = "\u234";
+	const int sdfl = 9999;
 	
+	private const int x = 2;
+	protected const object o = "32";
+}
+
+protected internal class C4 {
+	[ field : c ]
+	[ type : CC() ]
 	
-	int c = 123;
-} 
+	const ushort aa = "\u234";
+	const int sdfl = 9999;
+	
+	readonly float k = 2; // field declaration
+	static double j = 123; // field declaration
+	volatile int n = 59; 
+	
+	private const int x = 2;
+	protected const object o = "32";
+};
+
