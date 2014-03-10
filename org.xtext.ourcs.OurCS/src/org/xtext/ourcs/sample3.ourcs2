@@ -28,6 +28,10 @@ int a = f && d || z;
 //double a = 1.3E+9 * 1.9;
 //int a = e >> f;
 //int a = 3 + 5;
+//double a = 1.3E+9 * 1.9;
+//int a = 3 + 5;
+//int e = a * b * c * 2;
+//int a = e >> f;
 
 decimal a = base.a;
 int a = a & b;
