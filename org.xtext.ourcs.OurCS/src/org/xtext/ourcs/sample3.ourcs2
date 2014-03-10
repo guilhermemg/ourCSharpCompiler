@@ -25,8 +25,9 @@ decimal a1 = a && a;
 
 int a = f && d || z;
 
-double a = 1.3E+9 * 1.9;
-int a = 3 + 5;
+//double a = 1.3E+9 * 1.9;
+//int a = e >> f;
+//int a = 3 + 5;
 
 decimal a = base.a;
 int a = a & b;
@@ -112,7 +113,7 @@ while ( a > v ) {
 	}
 }
 
-// try statements --------------------------------------------------
+// try statements ----------------------------------------------------------
 
 try {
 	a = 2;
@@ -139,14 +140,16 @@ finally {
 }
 
 
-//pre-processing directives
+//pre-processing directives ---------------------------------------------------
+
 #define directive1
 #define directive2
 
+#undef directive2
+#undef directive1
 
 
-
-// attributes and classes declaration ----------------------------------------------------------
+// attributes and classes declaration ----------------------------------------
 
 [ param : sdfd, ksdd ]
 public abstract class C1 {
@@ -184,4 +187,36 @@ protected internal class C4 {
 	private const int x = 2;
 	protected const object o = "32";
 };
+
+protected internal class C4 {
+	[ field : c ]
+	[ type : CC() ]
+	
+	const ushort aa = "\u234";
+	const int sdfl = 9999;
+	
+	private const int x = 2;
+	protected const object o = "32";
+	
+	private static int meth1() {
+		int c = 2;
+		string k = "";	
+	}
+	
+	public static string meth2(int a, string x, string y) {
+		char c = 'c';	
+	}
+	
+	public void meth3(int a, int b) {
+		char d = 'd';
+		
+		if(k > 2) {
+			k++;
+		}
+		else {
+			k--;
+		}
+	}
+};
+
 

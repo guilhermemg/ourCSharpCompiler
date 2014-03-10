@@ -10,9 +10,38 @@ ProRule1:
 	INPUT;
 
 INPUT:
+	PP_DIRECTIVE |
 	VARIABLE_DECL |
 	STATEMENT |
 	CLASS_DECLARATION;
+
+// PRE PROCESSING DIRECTIVES ------------------------------------------------------
+
+PP_DIRECTIVE:
+    PP_DECLARATION 
+;
+
+PP_DECLARATION:
+    WS? '#' WS? PP_DECLARATION_LINE 
+;
+
+PP_DECLARATION_LINE:
+	('define' WS? CONDITIONAL_SYMBOL) |
+	('undef' WS? CONDITIONAL_SYMBOL)
+;
+
+CONDITIONAL_SYMBOL:
+    KEYWORD | ID;
+
+// KEYWORD -----------------------------------------------------------------------
+
+terminal KEYWORD:
+	'default' | 'explicit' | 'extern' | 'fixed' | 'foreach' | 'implicit' | 'in' | 
+	'internal' | 'is' | 'override' | 'sbyte'
+	| 'sealed' | 'sizeof' | 'stackalloc' | 'string' | 'struct' | 'uint' |
+	 'ulong' | 'unchecked' | 'unsafe' | 'ushort' |
+	'using' | 'virtual';
+
 
 // TYPES --------------------------------------------------------------------------
 
@@ -40,7 +69,7 @@ INTEGRAL_TYPE:
 
 BUILT_IN_TYPE:
 	INTEGRAL_TYPE |
-	//BUILT_IN_CLASS_TYPE |
+	BUILT_IN_CLASS_TYPE |
 	'bool' |
 	'decimal' |
 	'float' |
@@ -62,36 +91,40 @@ INT_LITERAL:
 STRING_LITERAL:
 	STRING;
 
-//REAL_TYPE_SUFFIX:
-//    'F' |
-//    'f' |
-//    'D' |
-//    'd' |
-//    'M' |
-//    'm';
-//
-//REAL_LITERAL:
-//    (INT_LITERAL '.' INT_LITERAL+ EXPONENT_PART? REAL_TYPE_SUFFIX?) |
-//    (INT_LITERAL+ EXPONENT_PART REAL_TYPE_SUFFIX?) |
-//    (INT_LITERAL+ REAL_TYPE_SUFFIX);
-//
-//EXPONENT_PART:
-//    ('e' SIGN? INT_LITERAL+) |
-//    ('E' SIGN? INT_LITERAL+);
-//
-//SIGN:
-//    '+' |
-//    '-';
+terminal REAL_LITERAL:
+	(DECIMAL_DIG* '.' DECIMAL_DIG+ EXPONENT_PART?) |
+	(DECIMAL_DIG EXPONENT_PART) |
+	(DECIMAL_DIG+);
 
+terminal EXPONENT_PART:
+	'e' SIGN? DECIMAL_DIG+ |
+	'E' SIGN? DECIMAL_DIG+;
+
+terminal DECIMAL_DIG:
+	'0' |
+	'1' |
+	'2' |
+	'3' |
+	'4' |
+	'5' |
+	'6' |
+	'7' |
+	'8' |
+	'9';
+
+terminal SIGN:
+	'+' |
+	'-';
+	
 LITERAL:
-	BOOL_LITERAL | NULL_LITERAL | INT_LITERAL | STRING_LITERAL /*| REAL_LITERAL*/;
+	BOOL_LITERAL | NULL_LITERAL | INT_LITERAL | STRING_LITERAL | REAL_LITERAL;
 
 // EXPRESSION ----------------------------------------------------------------
 
 ASSIGN_OPERATOR:
 	'=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=';
 
-REL_EXPRESSOIN:
+REL_EXPRESSION:
 	'==' | '!=' | '<=' | '>=' | '<' | '>';
 
 BOOL_OPERATORS:
@@ -117,25 +150,31 @@ PRIMARY_EXPRESSION:
 	//PRIMARY_EXPRESSION INCREMENT_DECREMENT |
 ;
 
-//ARGUMENT:
-//	('ref' | 'out')? EXPRESSION
-//;
+ARGUMENT:
+	REF_OR_OUT? EXPRESSION
+;
+
+REF_OR_OUT:
+	('ref' | 'out')
+;
+
 //
 //ARGUMENT_LIST:
 //	ARGUMENT ','?
 //;
-//
-//TYPE_OR_VOID:
-//	TYPE | 'void'	
-//;
+
+TYPE_OR_VOID:
+	TYPE | 'void'	
+;
 
 EXPRESSION_LIST:
 	EXPRESSION ','?;
 
 EXPRESSION:
 	COND_EXPRESSION |
-	UNA_EXP;// | 
-//	ARITHMETIC_EXP;
+	UNA_EXP1// | 
+//	ARITHMETIC_EXP
+;
 
 COND_EXPRESSION:
 	PRIMARY_EXPRESSION COND_EXPRESSION_LINE;
@@ -143,28 +182,27 @@ COND_EXPRESSION:
 COND_EXPRESSION_LINE:
 	(BOOL_OPERATORS EXPRESSION) |
 	('^' EXPRESSION) |
-	(REL_EXPRESSOIN EXPRESSION)
+	(REL_EXPRESSION EXPRESSION)
 ;
 
-UNA_EXP:
-	UNARY_EXPRESSION (ASSIGN_OPERATOR EXPRESSION)?;
+UNA_EXP1:
+	UNA_EXP2 (ASSIGN_OPERATOR EXPRESSION)?;
 
-UNARY_EXPRESSION:
-	( UNA_EXP_OPERATOR UNARY_EXPRESSION ) | 
-	( '(' TYPE ')' UNARY_EXPRESSION ) |
-	(PRIMARY_EXPRESSION); 
+UNA_EXP2:
+	( UNA_EXP_OPERATOR UNA_EXP2 ) | 
+	( '(' TYPE ')' UNA_EXP2 ) |
+	( PRIMARY_EXPRESSION ); 
 
 //ARITHMETIC_EXP:
-//	 ARITHMETIC_EXP_LINE?
+// 	(PRIMARY_EXPRESSION ARITHMETIC_EXP_LINE)
 //;
 //
 //ARITHMETIC_EXP_LINE:
-//	EXPRESSION_SHIFT_OPERATOR EXPRESSION ARITHMETIC_EXP_LINE |
-//	PLUS EXPRESSION ARITHMETIC_EXP_LINE |
-//	MINUS EXPRESSION ARITHMETIC_EXP_LINE |
-//	'*' EXPRESSION ARITHMETIC_EXP_LINE |
-//	'/' EXPRESSION ARITHMETIC_EXP_LINE |
-//	'%' EXPRESSION ARITHMETIC_EXP_LINE
+//	(PLUS EXPRESSION) | 
+// 	(MINUS EXPRESSION) | 
+//	('*' EXPRESSION) | 
+//	('/' EXPRESSION) | 
+//	(EXPRESSION_SHIFT_OPERATOR EXPRESSION)
 //;
 
 BAR:
@@ -180,8 +218,8 @@ UNA_EXP_OPERATOR:
 	PLUS | MINUS | INCREMENT_DECREMENT | '!' | '~' | '*';
 
 EXPRESSION_SHIFT_OPERATOR:
-    "<<" |
-    ">>";
+    '<<' |
+    '>>';
 
 PLUS:
 	'+';
@@ -223,16 +261,16 @@ ELSE_PART:
 	'else' BLOCK;
 
 SWITCH_LABEL:
-	("case" EXPRESSION ":") | ("default" ":");
+	('case' EXPRESSION ':') | ('default' ':');
 
 SWITCH_SECTION:
 	SWITCH_LABEL+ location=STATEMENT+;
 
 SWITCH_STATEMENT:
-	"switch" "(" ID ")" "{" location=SWITCH_SECTION* "}";
+	'switch' '(' ID ')' '{' location=SWITCH_SECTION* '}';
 
 BLOCK:
-	"{" location=STATEMENT* "}";
+	'{' location=STATEMENT* '}';
 
 ITERATION_STATEMENT:
 	WHILE_STATEMENT | DO_STATEMENT | FOR_STATEMENT
@@ -257,41 +295,41 @@ JUMP_STATEMENT:
 ;
 
 BREAK_STATEMENT:
-    "break" ";"
+    'break' ';'
 ;
 
 CONTINUE_STATEMENT:
-    "continue" ";"
+    'continue' ';'
 ;    
 
 GOTO_STATEMENT:
-    ("goto" ID ";") |
-    ("goto" "case" COND_EXPRESSION ";") |
-    ("goto" "default" ";")
+    ('goto' ID ';') |
+    ('goto' 'case' COND_EXPRESSION ';') |
+    ('goto' 'default' ';')
 ;
 
 RETURN_STATEMENT:
-    "return" EXPRESSION? ";"
+    'return' EXPRESSION? ';'
 ;
 
 THROW_STATEMENT:
-    "throw" EXPRESSION? ";"
+    'throw' EXPRESSION? ';'
 ;
 
 BUILT_IN_CLASS_TYPE:
-    "object" |
-    "string"
+    'object' |
+    'string'
 ;
 
 GENERAL_CATCH_CLAUSE:
-    "catch" BLOCK;
+    'catch' BLOCK;
 
 SPECIFIC_CATCH_CLAUSE:
-    "catch" "(" BUILT_IN_CLASS_TYPE ID? ")" BLOCK
+    'catch' '(' BUILT_IN_CLASS_TYPE ID? ')' BLOCK
 ;
 
 FINALLY_CLAUSE:
-    "finally" BLOCK;
+    'finally' BLOCK;
 
 CATCH_CLAUSES:
     //(location=SPECIFIC_CATCH_CLAUSE+ location=GENERAL_CATCH_CLAUSE?) |
@@ -304,7 +342,7 @@ TRY_STATEMENT_LINE:
 ;
 
 TRY_STATEMENT:
-    "try" BLOCK location=TRY_STATEMENT_LINE 
+    'try' BLOCK location=TRY_STATEMENT_LINE 
 ;
 
 STATEMENT:
@@ -377,7 +415,7 @@ CONST_OR_FIELD_DECL:
 ;
 
 CONST_OR_FIELD_DECL_LINE:
-	CONSTANT_DECLARATION | FIELD_DECLARATION
+	CONSTANT_DECLARATION | FIELD_DECLARATION | METHOD_DECLARATION
 ;
 
 CONSTANT_DECLARATION:
@@ -397,3 +435,30 @@ FIELD_MODIFIER:
     'static' |
     'readonly' |
     'volatile';
+
+METHOD_DECLARATION:
+    METHOD_HEADER BLOCK;
+    
+METHOD_HEADER:
+	ATTRIBUTES METHOD_MODIFIER* TYPE_OR_VOID ID '(' FIXED_PARAMETERS* ')'
+;   
+
+METHOD_MODIFIER:
+    CONSTANT_MODIFIER |
+    'static' |
+    'virtual' |
+    'sealed' |
+    'override' |
+    'abstract' |
+    'extern'   
+;    
+
+FIXED_PARAMETERS:
+    FIXED_PARAMETER ','?;
+
+FIXED_PARAMETER:
+    ATTRIBUTES PARAMETER_MODIFIER? TYPE ID;
+    
+PARAMETER_MODIFIER:
+	REF_OR_OUT
+;
