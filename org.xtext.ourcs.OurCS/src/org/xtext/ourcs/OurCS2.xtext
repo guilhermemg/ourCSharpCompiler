@@ -10,41 +10,15 @@ ProRule1:
 	INPUT;
 
 INPUT:
+	VARIABLE_DECL |
 	STATEMENT |
 	CLASS_DECLARATION;
 
-//TYPES_____________________________________________________________________
+// TYPES --------------------------------------------------------------------------
 
 PREDEFINED_TYPE:
 	'bool' | 'byte' | 'char' | 'decimal' | 'double' | 'float' | 'int' | 'long' | 'object' | 'sbyte' | 'short' | 'string' |
 	'uint' | 'ulong' | 'ushort';
-
-	//LITERAL__________________________________________________________________
-BOOL_LITERAL:
-	'true' | 'false';
-
-NULL_LITERAL:
-	'null';
-
-INT_LITERAL:
-	INT;
-
-STRING_LITERAL:
-	STRING;
-
-LITERAL:
-	BOOL_LITERAL | NULL_LITERAL | INT_LITERAL | STRING_LITERAL;
-
-	//EXPRESSIOIN__________________________________________________________
-
-ASSIGN_OPERATOR:
-	'=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=';
-
-REL_EXPRESSOIN:
-	'==' | '!=' | '<=' | '>=' | '<' | '>';
-
-BOOL_OPERATORS:
-	'||' | '&&' | BAR | AMPERSAND | '%';
 
 TYPE:
 	NON_ARRAY_TYPE RANK_SPECIFIER*;
@@ -73,35 +47,125 @@ BUILT_IN_TYPE:
 	'double';
 
 RANK_SPECIFIER:
-	'[' ','* ']';
+	'[' ','* ']';	
+
+//LITERAL -------------------------------------------------------------------------
+BOOL_LITERAL:
+	'true' | 'false';
+
+NULL_LITERAL:
+	'null';
+
+INT_LITERAL:
+	INT;
+
+STRING_LITERAL:
+	STRING;
+
+//REAL_TYPE_SUFFIX:
+//    'F' |
+//    'f' |
+//    'D' |
+//    'd' |
+//    'M' |
+//    'm';
+//
+//REAL_LITERAL:
+//    (INT_LITERAL '.' INT_LITERAL+ EXPONENT_PART? REAL_TYPE_SUFFIX?) |
+//    (INT_LITERAL+ EXPONENT_PART REAL_TYPE_SUFFIX?) |
+//    (INT_LITERAL+ REAL_TYPE_SUFFIX);
+//
+//EXPONENT_PART:
+//    ('e' SIGN? INT_LITERAL+) |
+//    ('E' SIGN? INT_LITERAL+);
+//
+//SIGN:
+//    '+' |
+//    '-';
+
+LITERAL:
+	BOOL_LITERAL | NULL_LITERAL | INT_LITERAL | STRING_LITERAL /*| REAL_LITERAL*/;
+
+// EXPRESSION ----------------------------------------------------------------
+
+ASSIGN_OPERATOR:
+	'=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=';
+
+REL_EXPRESSOIN:
+	'==' | '!=' | '<=' | '>=' | '<' | '>';
+
+BOOL_OPERATORS:
+	'||' | '&&' | BAR | AMPERSAND | '%';
 
 PRIMARY_EXPRESSION:
 //'new' NON_ARRAY_TYPE '[' EXPRESSION_LIST ']' RANK_SPECIFIER* ARRAY_INITIALIZER? |
 //'new' ARRAY_TYPE ARRAY_INITIALIZER |
-	LITERAL | ID |
-	//'(' EXPRESSION ')' |
-	//PRIMARY_EXPRESSION '.' ID |
-	PREDEFINED_TYPE '.' ID |
+	( LITERAL ) | 
+	( ID ) |
+//	( '(' EXPRESSION ')' ) |
+	( PREDEFINED_TYPE '.' ID ) |
+	( 'this' ) | 
+	( 'base' '.' ID ) //|
+//	( 'base' '[' EXPRESSION_LIST ']' ) |
+//	( 'new' TYPE '(' ARGUMENT_LIST ')' ) |
+//	( 'typeof' '(' TYPE_OR_VOID ')' ) |
+//	( 'checked' '(' EXPRESSION ')' ) |
+//	( 'unchecked' '(' EXPRESSION ')' )
+    //PRIMARY_EXPRESSION '.' ID |
 	//PRIMARY_EXPRESSION '(' ARGUMENT_LIST ')' |
 	//PRIMARY_EXPRESSION '[' EXPRESSION_LIST ']' |
-	'this' | 'base' '.' ID
-	//'base' '[' EXPRESSION_LIST ']' |
 	//PRIMARY_EXPRESSION INCREMENT_DECREMENT |
-	//'new' TYPE '(' ARGUMENT_LIST ')' |
-	//'typeof' '(' TYPE_OR_VOID ')';// |
-	//'checked' '(' EXPRESSION ')' |
-	//'unchecked' '(' EXPRESSION ')';
 ;
+
+//ARGUMENT:
+//	('ref' | 'out')? EXPRESSION
+//;
+//
+//ARGUMENT_LIST:
+//	ARGUMENT ','?
+//;
+//
+//TYPE_OR_VOID:
+//	TYPE | 'void'	
+//;
 
 EXPRESSION_LIST:
 	EXPRESSION ','?;
 
 EXPRESSION:
-	COND_EXPRESSION | UNA_EXP;
+	COND_EXPRESSION |
+	UNA_EXP;// | 
+//	ARITHMETIC_EXP;
 
-EXPRESSION_LINE:
-	(PRIMARY_EXPRESSION BOOL_OPERATORS EXPRESSION) | (PRIMARY_EXPRESSION '^' EXPRESSION) | (PRIMARY_EXPRESSION
-	REL_EXPRESSOIN EXPRESSION);
+COND_EXPRESSION:
+	PRIMARY_EXPRESSION COND_EXPRESSION_LINE;
+
+COND_EXPRESSION_LINE:
+	(BOOL_OPERATORS EXPRESSION) |
+	('^' EXPRESSION) |
+	(REL_EXPRESSOIN EXPRESSION)
+;
+
+UNA_EXP:
+	UNARY_EXPRESSION (ASSIGN_OPERATOR EXPRESSION)?;
+
+UNARY_EXPRESSION:
+	( UNA_EXP_OPERATOR UNARY_EXPRESSION ) | 
+	( '(' TYPE ')' UNARY_EXPRESSION ) |
+	(PRIMARY_EXPRESSION); 
+
+//ARITHMETIC_EXP:
+//	 ARITHMETIC_EXP_LINE?
+//;
+//
+//ARITHMETIC_EXP_LINE:
+//	EXPRESSION_SHIFT_OPERATOR EXPRESSION ARITHMETIC_EXP_LINE |
+//	PLUS EXPRESSION ARITHMETIC_EXP_LINE |
+//	MINUS EXPRESSION ARITHMETIC_EXP_LINE |
+//	'*' EXPRESSION ARITHMETIC_EXP_LINE |
+//	'/' EXPRESSION ARITHMETIC_EXP_LINE |
+//	'%' EXPRESSION ARITHMETIC_EXP_LINE
+//;
 
 BAR:
 	'|';
@@ -109,23 +173,15 @@ BAR:
 AMPERSAND:
 	'&';
 
-COND_EXPRESSION:
-	EXPRESSION_LINE;
-
 INCREMENT_DECREMENT:
 	'++' | '--';
 
-UNA_EXP:
-	UNARY_EXPRESSION EXPRESSION_LINE_1;
-
-EXPRESSION_LINE_1:
-	(ASSIGN_OPERATOR EXPRESSION)?;
-
-UNARY_EXPRESSION:
-	EXPRESSION_UNARY_OPERATOR UNARY_EXPRESSION | '(' TYPE ')' UNARY_EXPRESSION | PRIMARY_EXPRESSION;
-
-EXPRESSION_UNARY_OPERATOR:
+UNA_EXP_OPERATOR:
 	PLUS | MINUS | INCREMENT_DECREMENT | '!' | '~' | '*';
+
+EXPRESSION_SHIFT_OPERATOR:
+    "<<" |
+    ">>";
 
 PLUS:
 	'+';
@@ -133,20 +189,32 @@ PLUS:
 MINUS:
 	'-';
 
-/* A.2.5 Statements _________________________________________________________________________*/
+// VARIABLE DECLARATION --------------------------------------------------------
+
+VARIABLE_DECL:
+	PREDEFINED_TYPE ID ';'
+;
+
+// STATEMENTS ------------------------------------------------------------------
 ASSIGN_STMT:
-	(PREDEFINED_TYPE name=ID ASSIGN_OPERATOR LITERAL ';') | 
-	(name=ID INCREMENT_DECREMENT ';') |
-	(INCREMENT_DECREMENT name=ID ';') | 
+	(ASSIGN_STMT_LINE ';'?) |
+	
 	(INCREMENT_DECREMENT name=ID) |
 	(name=ID INCREMENT_DECREMENT) |
-	(name=ID ASSIGN_OPERATOR LITERAL';');
+	
+	(SIMPLE_ASSIGN_STATEMENT) 
+;
 
-SIMPLE_STMT_DECLARATION:
-	PREDEFINED_TYPE name=ID ';';
+ASSIGN_STMT_LINE:
+	(PREDEFINED_TYPE name=ID ASSIGN_OPERATOR LITERAL) |
+	(PREDEFINED_TYPE name=ID ASSIGN_OPERATOR EXPRESSION)
+;
 
-SIMPLE_COND_STMT_ASSIGN:
-	PREDEFINED_TYPE name=ID ASSIGN_OPERATOR EXPRESSION ';';
+SIMPLE_ASSIGN_STATEMENT:
+	(name=ID INCREMENT_DECREMENT ';') |
+	(INCREMENT_DECREMENT name=ID ';') |
+	(name=ID ASSIGN_OPERATOR LITERAL';')	
+;
 
 IF_STATEMENT:
 	'if' '(' EXPRESSION ')' BLOCK location=ELSE_PART?;
@@ -240,9 +308,9 @@ TRY_STATEMENT:
 ;
 
 STATEMENT:
-	ASSIGN_STMT | SIMPLE_STMT_DECLARATION | SIMPLE_COND_STMT_ASSIGN | IF_STATEMENT | ITERATION_STATEMENT |
-	SWITCH_STATEMENT | JUMP_STATEMENT | TRY_STATEMENT;
-	
+	ASSIGN_STMT | IF_STATEMENT | ITERATION_STATEMENT |
+	SWITCH_STATEMENT | JUMP_STATEMENT | TRY_STATEMENT
+;
 
 // ATTRIBUTES -------------------------------------------------------------------
 
@@ -250,17 +318,17 @@ ATTRIBUTES:
     ATTRIBUTES_SECTION*;
 
 ATTRIBUTES_SECTION:
-    "[" ( ATTRIBUTE_TARGET ":" )? ATTRIBUTE_LIST "]";
+    '[' ( ATTRIBUTE_TARGET ':' )? ATTRIBUTE_LIST* ']';
 
 ATTRIBUTE_TARGET:
-    "field" |
-    "event" |
-    "method" |
-    "module" |
-    "param" |
-    "property" |
-    "return" |
-    "type";
+    'field' |
+    'event' |
+    'method' |
+    'module' |
+    'param' |
+    'property' |
+    'return' |
+    'type';
 
 ATTRIBUTE_LIST:
     ATTRIBUTE ','?;
@@ -272,47 +340,60 @@ ATTRIBUTE_NAME:
     ID;
 
 ATTRIBUTE_ARGUMENTS:
-    "(" EXPRESSION_LIST? ")";
+    '(' EXPRESSION_LIST* ')';
 
 // classes ----------------------------------------------------------------------
 
 CLASS_DECLARATION:
-    ATTRIBUTES CLASS_MODIFIER* "class" ID /*CLASS_BASE? CLASS_BODY*/ ";"?;
+    ATTRIBUTES CLASS_MODIFIER* 'class' ID /*CLASS_BASE?*/ CLASS_BODY ';'?;
 
 CLASS_MODIFIER:
-    "new" |
-    "public" |
-    "protected" |
-    "internal" |
-    "private" |
-    "abstract" |
-    "sealed";
+    'new' |
+    'public' |
+    'protected' |
+    'internal' |
+    'private' |
+    'abstract' |
+    'sealed';
     
-//CLASS_BODY:
-//    "{" location=CLASS_MEMBER_DECLARATION* "}";
-//
-//CLASS_MEMBER_DECLARATION:
-//    CONSTANT_DECLARATION
-////    field-declaration |
-////    method-declaration |
-////    property-declaration |
-////    event-declaration |
-////    indexer-declaration |
-////    operator-declaration |
-////    constructor-declaration |
-////    destructor-declaration |
-////    static-constructor-declaration |
-////    type-declaration   
-//;
-//
-//CONSTANT_DECLARATION:
-//    ATTRIBUTES CONSTANT_MODIFIER* "const" ASSIGN_STMT;
-//
-//CONSTANT_MODIFIER:
-//    "new" |
-//    "public" |
-//    "protected" | 
-//    "internal" |
-//    "private";
+CLASS_BODY:
+    '{' location=CLASS_MEMBER_DECLARATION* '}';
 
-    
+CLASS_MEMBER_DECLARATION:
+    CONST_OR_FIELD_DECL
+//    method-declaration |
+//    property-declaration |
+//    event-declaration |
+//    indexer-declaration |
+//    operator-declaration |
+//    constructor-declaration |
+//    destructor-declaration |
+//    static-constructor-declaration |
+//    type-declaration   
+;
+
+CONST_OR_FIELD_DECL:
+	ATTRIBUTES CONST_OR_FIELD_DECL_LINE
+;
+
+CONST_OR_FIELD_DECL_LINE:
+	CONSTANT_DECLARATION | FIELD_DECLARATION
+;
+
+CONSTANT_DECLARATION:
+    CONSTANT_MODIFIER* 'const' ASSIGN_STMT;
+
+CONSTANT_MODIFIER:
+    'new' |
+    'public' |
+    'protected' | 
+    'internal' |
+    'private';
+
+FIELD_DECLARATION:
+    (FIELD_MODIFIER | CONSTANT_MODIFIER)* TYPE ASSIGN_STMT;
+
+FIELD_MODIFIER:
+    'static' |
+    'readonly' |
+    'volatile';
