@@ -25,6 +25,9 @@ decimal a1 = a && a;
 
 int a = f && d || z;
 
+double a = 1.3E+9 * 1.9;
+int a = 3 + 5;
+
 decimal a = base.a;
 int a = a & b;
 decimal a = null;
@@ -132,8 +135,16 @@ catch {
 	d += "ssssssssss"; // general catch block
 }
 finally {
-	decimal ja = 1;
+	decimal ja = 1.2e+0;
 }
+
+
+//pre-processing directives
+#define directive1
+#define directive2
+
+
+
 
 // attributes and classes declaration ----------------------------------------------------------
 
